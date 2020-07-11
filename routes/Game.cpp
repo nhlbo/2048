@@ -48,8 +48,8 @@ void Game::start() {
 			bool moved = 0;
 			if (e.type == Event::Closed) window->close();
 			else if (e.type == Event::KeyPressed) {
-				if (e.key.code == Keyboard::Left || e.key.code == Keyboard::D) moved |= this->moveLeft();
-				if (e.key.code == Keyboard::Right || e.key.code == Keyboard::A) moved |= this->moveRight();
+				if (e.key.code == Keyboard::Left || e.key.code == Keyboard::A) moved |= this->moveLeft();
+				if (e.key.code == Keyboard::Right || e.key.code == Keyboard::D) moved |= this->moveRight();
 				if (e.key.code == Keyboard::Up || e.key.code == Keyboard::W) moved |= this->moveUp();
 				if (e.key.code == Keyboard::Down || e.key.code == Keyboard::S) moved |= this->moveDown();
 			}
