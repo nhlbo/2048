@@ -30,6 +30,8 @@ Game::Game() {
 	this->scoreBoardTitle.setPosition(565 - this->scoreBoardTitle.getLocalBounds().width / 2, 135);
 	this->renderText(this->bestScoreBoardTitle, "Best Score", Color::White, 15, 565, 135);
 	this->bestScoreBoardTitle.setPosition(565 - this->bestScoreBoardTitle.getLocalBounds().width / 2, 205);
+	this->renderText(this->loseTitle, "You Lose", Color(108, 99, 91), 30, 565, 135);
+	this->loseTitle.setPosition(565 - this->loseTitle.getLocalBounds().width / 2, 300);
 }
 
 Game::~Game() {
@@ -103,6 +105,7 @@ void Game::render() {
 	this->window->draw(this->bestScoreBoard);
 	this->window->draw(this->bestScoreBoardTitle);
 	this->window->draw(this->bestScoreTitle);
+	this->window->draw(this->loseTitle);
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			this->window->draw(cellsColor[i][j]);
@@ -170,6 +173,10 @@ void Game::updateCells() {
 			this->cellsText[i][j].setPosition(this->coorText[j] - this->cellsText[i][j].getLocalBounds().width / 2, this->coorText[i] - this->cellsText[i][j].getLocalBounds().height);
 		}
 	}
+}
+
+bool isLose() {
+	return false;
 }
 
 void Game::moveLeft() {
