@@ -422,7 +422,43 @@ void Game::loadBestScore() {
 }
 
 void Game::saveTable() {
+	fstream fTemp;
+	fTemp.open("assets/temp.txt", ios::out);
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			fTemp << this->table[i][j] << " ";
+		}
+		fTemp << endl;
+	}
+	fTemp.close();
+	remove("assets/table.txt");
+	rename("assets/temp.txt", "assets/table.txt");
 }
 
 void Game::loadTable() {
+	int temp[4][4];
+	fstream f;
+	f.open("assets/table.txt");
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4; j++)
+			f >> temp[i][j];
+	f.close();
+
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4; j++)
+			if (this->table[i][j] == 0)
+				return;
+
+	int check = -1;
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 3; j++)
+			if (this->table[i][j] == this->table[i][j + 1])
+				check++;
+	for (int j = 0; j < 4; j++)
+		for (int i = 0; i < 3; i++)
+			if (this->table[i][j] == this->table[i + 1][j])
+				check++;
+	if (check < 0)
+		this->isLose = true;
 }

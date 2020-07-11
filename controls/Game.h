@@ -1,7 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <fstream>
 
 using namespace sf;
 using namespace std;
@@ -13,6 +15,7 @@ public:
 	void start();
 
 private:
+	bool isLose;
 	const int coor[4] = { 20, 130, 240, 350 };
 	const int coorText[4] = { 70, 180, 290, 400 };
 	RenderWindow* window;
@@ -23,6 +26,7 @@ private:
 	int score, bestScore;
 
 	void newGame();
+	void addNewCell();
 	void update();
 	void render();
 	void renderText(Text& text, string str, Color color, int fontSize, int x, int y);
