@@ -416,9 +416,20 @@ bool Game::moveDown() {
 }
 
 void Game::saveBestScore() {
+	fstream f;
+	remove("assets/best_score.txt");
+	f.open("assets/best_score.txt", ios::out);
+	f << this->score;
+	f.close();
 }
 
 void Game::loadBestScore() {
+	int s;
+	fstream f;
+	f.open("assets/best_score.txt", ios::in);
+	f >> s;
+	f.close();
+	s != 0 ? this->bestScore = s : this->bestScore = 0;
 }
 
 void Game::saveTable() {
