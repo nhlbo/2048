@@ -13,7 +13,7 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="asseets">
+    <Filter Include="assets">
       <UniqueIdentifier>{7ab575b3-0644-4a9a-a2e9-a0a581596bed}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -32,15 +32,15 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\best_score.txt">
-      <Filter>asseets</Filter>
+      <Filter>assets</Filter>
     </Text>
     <Text Include="assets\table.txt">
-      <Filter>asseets</Filter>
+      <Filter>assets</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\ClearSans-Bold.ttf">
-      <Filter>asseets</Filter>
+      <Filter>assets</Filter>
     </Font>
   </ItemGroup>
 </Project>
