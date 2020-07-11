@@ -13,8 +13,8 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="asset">
-      <UniqueIdentifier>{c82f8152-a5ec-422e-9e3c-020833aec9fb}</UniqueIdentifier>
+    <Filter Include="asseets">
+      <UniqueIdentifier>{7ab575b3-0644-4a9a-a2e9-a0a581596bed}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -31,16 +31,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="C:\Users\DELL\Documents\GitHub\2048\assets\best_score.txt">
-      <Filter>asset</Filter>
+    <Text Include="assets\best_score.txt">
+      <Filter>asseets</Filter>
     </Text>
-    <Text Include="C:\Users\DELL\Documents\GitHub\2048\assets\table.txt">
-      <Filter>asset</Filter>
+    <Text Include="assets\table.txt">
+      <Filter>asseets</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <Font Include="C:\Users\DELL\Documents\GitHub\2048\assets\ClearSans-Bold.ttf">
-      <Filter>asset</Filter>
+    <Font Include="assets\ClearSans-Bold.ttf">
+      <Filter>asseets</Filter>
     </Font>
   </ItemGroup>
 </Project>

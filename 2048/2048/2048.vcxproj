@@ -151,11 +151,11 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="C:\Users\DELL\Documents\GitHub\2048\assets\best_score.txt" />
-    <Text Include="C:\Users\DELL\Documents\GitHub\2048\assets\table.txt" />
+    <Text Include="assets\best_score.txt" />
+    <Text Include="assets\table.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="C:\Users\DELL\Documents\GitHub\2048\assets\ClearSans-Bold.ttf" />
+    <Font Include="assets\ClearSans-Bold.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

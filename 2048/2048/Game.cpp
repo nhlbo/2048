@@ -65,11 +65,13 @@ void Game::start() {
 void Game::newGame() {
 	this->score = 0;
 	for (int i = 0; i < 4; i++)
-		for (int j = 0; j < 4; j++) this->table[i][j] = 0;
+		for (int j = 0; j < 4; j++) 
+			this->table[i][j] = 0;
 	for (int i = 0; i < 2; i++) {
 		while (true) {
 			int x = rand() % 4, y = rand() % 4;
-			if (this->table[x][y] != 0) continue;
+			if (this->table[x][y] != 0) 
+				continue;
 			else {
 				this->table[x][y] = 1 << (rand() % 2 + 1);
 				break;
