@@ -15,7 +15,7 @@ private:
 	const int coorText[4] = { 70, 180, 290, 400 };
 	RenderWindow* window;
 	RectangleShape backgroundTable, cellsColor[4][4], newGameButton, scoreBoard, bestScoreBoard;
-	Text newGameTitle, scoreTitle, scoreBoardTitle, bestScoreTitle, bestScoreBoardTitle, cellsText[4][4];
+	Text newGameTitle, scoreTitle, scoreBoardTitle, bestScoreTitle, bestScoreBoardTitle, loseTitle, cellsText[4][4];
 	Font font;
 	int table[4][4];
 	int score, bestScore;
@@ -28,6 +28,7 @@ private:
 	int getFontSize(int point);
 	Color getCellColor(int val);
 	void updateCells();
+	bool isLose();
 	void moveLeft();
 	void moveRight();
 	void moveUp();
