@@ -126,59 +126,7 @@ void Game::renderText(Text& text, string str, Color color, int fontSize, int x, 
 	text.setFillColor(color);
 	text.setPosition(x, y);
 }
-/*
-string Game::pointToString(int point) {
-	return (point == 0 ? "" : to_string(point));
-}
 
-int Game::getFontSize(int point) {
-	int cnt = 0;
-	while (point > 0) {
-		point /= 10;
-		cnt++;
-	}
-	if (cnt == 1) return 40;
-	else if (cnt == 2) return 40;
-	else if (cnt == 3) return 35;
-	else if (cnt == 4) return 30;
-	else if (cnt == 5) return 25;
-	else if (cnt == 6) return 20;
-	return 0;
-}
-
-Color Game::getCellColor(int val) {
-	Color res;
-	if (val == 0) res = Color(198, 184, 171);
-	else if (val == 2) res = Color(236, 224, 214);
-	else if (val == 4) res = Color(235, 220, 195);
-	else if (val == 8) res = Color(243, 168, 115);
-	else if (val == 16) res = Color(248, 139, 94);
-	else if (val == 32) res = Color(250, 113, 90);
-	else if (val == 64) res = Color(251, 85, 60);
-	else if (val == 128) res = Color(236, 201, 111);
-	else if (val == 256) res = Color(236, 198, 97);
-	else if (val == 512) res = Color(237, 194, 83);
-	else if (val == 1024) res = Color(237, 191, 71);
-	else if (val == 2048) res = Color(239, 187, 57);
-	else if (val == 4096) res = Color(240, 92, 97);
-	else if (val == 8192) res = Color(246, 67, 84);
-	else if (val == 16384) res = Color(249, 57, 62);
-	else if (val == 32768) res = Color(99, 168, 203);
-	else if (val == 65536) res = Color(73, 147, 212);
-	else if (val == 131072) res = Color(0, 116, 192);
-	return res;
-}
-
-void Game::updateCells() {
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			cellsColor[i][j].setFillColor(this->getCellColor(this->table[i][j]));
-			this->renderText(this->cellsText[i][j], pointToString(this->table[i][j]), (this->table[i][j] <= 4 ? Color(108, 99, 91) : Color::White), this->getFontSize(table[i][j]), this->coor[j], this->coor[i]);
-			this->cellsText[i][j].setPosition(this->coorText[j] - this->cellsText[i][j].getLocalBounds().width / 2, this->coorText[i] - this->cellsText[i][j].getLocalBounds().height);
-		}
-	}
-}
-*/
 void Game::moving_animation(int i, int j, int u, int v) {
 	cells[u][v] = 0;
 	update();
