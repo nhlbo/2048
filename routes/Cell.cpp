@@ -41,10 +41,10 @@ void Cell::update(int val) {
 	m_text.setPosition(sf::Vector2f(m_pos_text.x - m_text.getLocalBounds().width / 2, m_pos_text.y - m_text.getLocalBounds().height));
 	// Update Texture
 	if (m_data == 0) {
-		m_shape.setTextureRect(sf::IntRect(0, 0, WIDTH, HEIGHT));
+		m_shape.setTextureRect(sf::IntRect(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT));
 	}
 	else {
-		m_shape.setTextureRect(sf::IntRect(0 + 128 * log2(m_data), 0, WIDTH, HEIGHT));
+		m_shape.setTextureRect(sf::IntRect(0 + 128 * log2(m_data), 0, TEXTURE_WIDTH, TEXTURE_HEIGHT));
 	}
 }
 
