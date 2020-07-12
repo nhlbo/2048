@@ -15,7 +15,6 @@ public:
 	void start();
 
 private:
-	bool isLose;
 	const int coor[4] = { 20, 130, 240, 350 };
 	const int coorText[4] = { 70, 180, 290, 400 };
 	RenderWindow* window;
@@ -24,6 +23,7 @@ private:
 	Font font;
 	int table[4][4];
 	int score, bestScore;
+	bool firstLoad;
 
 	void newGame();
 	void addNewCell();
@@ -41,6 +41,7 @@ private:
 	bool moveRight();
 	bool moveUp();
 	bool moveDown();
+	bool isLose();
 	void saveBestScore();
 	void loadBestScore();
 	void saveTable();
