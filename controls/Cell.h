@@ -2,6 +2,8 @@
 #define CELL_H
 #include <SFML/Graphics.hpp>
 
+#define TEXTURE_WIDTH 128
+#define TEXTURE_HEIGHT 128
 #define WIDTH m_size.x
 #define HEIGHT m_size.y
 
