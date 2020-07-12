@@ -29,7 +29,6 @@ private:
 	bool firstLoad;
 
 	void newGame();
-	void addNewCell();
 	void update();
 	void render();
 	void renderText(Text& text, string str, Color color, int fontSize, int x, int y);
@@ -41,6 +40,7 @@ private:
 	bool moveRight();
 	bool moveUp();
 	bool moveDown();
+
 	bool isLose();
 	void saveBestScore();
 	void loadBestScore();

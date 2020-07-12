@@ -1,34 +1,20 @@
 #include "..\controls\Cell.h"
 
-// identify static attributes
-sf::Vector2f Cell::m_size(sf::Vector2f(WIDTH, HEIGHT));
-sf::Font Cell::m_font(creatFont(FONT));
+// identify static attributes (default)
+sf::Vector2f Cell::m_size(sf::Vector2f(100, 100));
+sf::Texture Cell::m_skin(creatTexture("data/texture/4x4-1.png"));
+sf::Font Cell::m_font(creatFont("data/ClearSans-Bold.ttf"));
+
+sf::Texture Cell::creatTexture(const char* _texture) {
+	sf::Texture texture;
+	texture.loadFromFile(_texture);
+	return texture;
+}
 
 sf::Font Cell::creatFont(const char* _font) {
 	sf::Font font;
 	font.loadFromFile(_font);
 	return font;
-}
-
-sf::Color Cell::getColor(int val) {
-	if (val == 0) return sf::Color(198, 184, 171);
-	if (val == 2) return sf::Color(236, 224, 214);
-	if (val == 4) return sf::Color(235, 220, 195);
-	if (val == 8) return sf::Color(243, 168, 115);
-	if (val == 16) return sf::Color(248, 139, 94);
-	if (val == 32) return sf::Color(250, 113, 90);
-	if (val == 64) return sf::Color(251, 85, 60);
-	if (val == 128) return sf::Color(236, 201, 111);
-	if (val == 256) return sf::Color(236, 198, 97);
-	if (val == 512) return sf::Color(237, 194, 83);
-	if (val == 1024) return sf::Color(237, 191, 71);
-	if (val == 2048) return sf::Color(239, 187, 57);
-	if (val == 4096) return sf::Color(240, 92, 97);
-	if (val == 8192) return sf::Color(246, 67, 84);
-	if (val == 16384) return sf::Color(249, 57, 62);
-	if (val == 32768) return sf::Color(99, 168, 203);
-	if (val == 65536) return sf::Color(73, 147, 212);
-	if (val == 131072) return sf::Color(0, 116, 192);
 }
 
 int Cell::getTextSize(int point) {
@@ -48,15 +34,23 @@ int Cell::getTextSize(int point) {
 
 void Cell::update(int val) {
 	if (val > -1) m_data = val;
-	m_shape.setFillColor(getColor(m_data));
+	// Update Text
 	m_text.setString((m_data == 0 ? "" : std::to_string(m_data)));
 	m_text.setCharacterSize(getTextSize(m_data));
 	m_text.setFillColor((m_data <= 4 ? sf::Color(108, 99, 91) : sf::Color::White));
 	m_text.setPosition(sf::Vector2f(m_pos_text.x - m_text.getLocalBounds().width / 2, m_pos_text.y - m_text.getLocalBounds().height));
+	// Update Texture
+	if (m_data == 0) {
+		m_shape.setTextureRect(sf::IntRect(0, 0, WIDTH, HEIGHT));
+	}
+	else {
+		m_shape.setTextureRect(sf::IntRect(0 + 128 * log2(m_data), 0, WIDTH, HEIGHT));
+	}
 }
 
 Cell::Cell() {
 	m_shape.setSize(m_size);
+	m_shape.setTexture(&m_skin);
 	m_text.setFont(m_font);
 	update(0);
 }
@@ -71,6 +65,18 @@ sf::Text Cell::getText() {
 
 int Cell::getVal() {
 	return m_data;
+}
+
+void Cell::setSize(float width, float height) {
+	Cell::m_size = sf::Vector2f(width, height);
+}
+
+void Cell::setTexture(const char* _texture) {
+	Cell::m_skin.loadFromFile(_texture);
+}
+
+void Cell::setFont(const char* _font) {
+	Cell::m_font.loadFromFile(_font);
 }
 
 void Cell::setPosition(float x, float y) {
