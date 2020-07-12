@@ -3,7 +3,7 @@
 
 int main() {
 	sf::Music music_background;
-	if (!music_background.openFromFile(".\\data\\audio\\KILL_EM_WITH_KINDNESS.wav"))
+	if (!music_background.openFromFile(".\\data\\audio\\background.wav"))
 		throw std::runtime_error("Background music file missing");
 	music_background.setLoop(1);
 	music_background.play();
