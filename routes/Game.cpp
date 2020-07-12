@@ -22,10 +22,12 @@ Game::Game() {
 	this->bestScoreBoard.setSize(Vector2f(110, 50));
 	this->bestScoreBoard.setFillColor(Color(177, 164, 152));
 	this->bestScoreBoard.setPosition(510, 200);
+
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			this->cellsColor[i][j].setSize(Vector2f(100, 100));
-			this->cellsColor[i][j].setPosition(this->coor[j], this->coor[i]);
+			// class::Cell
+			cells[i][j].setPosition(coor[j], coor[i]);
+			cells[i][j].setPositionText(coorText[j], coorText[i]);
 		}
 	}
 	this->renderText(this->newGameTitle, "New Game", Color::White, 15, 527, 75);
@@ -75,17 +77,9 @@ void Game::start() {
 void Game::newGame() {
 	this->score = 0;
 	for (int i = 0; i < 4; i++)
-		for (int j = 0; j < 4; j++) this->table[i][j] = 0;
-	for (int i = 0; i < 2; i++) {
-		while (true) {
-			int x = rand() % 4, y = rand() % 4;
-			if (this->table[x][y] != 0) continue;
-			else {
-				this->table[x][y] = 1 << (rand() % 2 + 1);
-				break;
-			}
-		}
-	}
+		for (int j = 0; j < 4; j++) cells[i][j] = 0;
+	newCells();
+	newCells();
 	if (this->firstLoad) {
 		this->firstLoad = false;
 		this->loadTable();
@@ -99,7 +93,7 @@ void Game::update() {
 	this->scoreTitle.setPosition(565 - this->scoreTitle.getLocalBounds().width / 2, 155);
 	this->renderText(this->bestScoreTitle, to_string(this->bestScore), Color::White, 15, 565, 235);
 	this->bestScoreTitle.setPosition(565 - this->bestScoreTitle.getLocalBounds().width / 2, 225);
-	this->updateCells();
+	//this->updateCells();
 	if (score > bestScore) {
 		bestScore = score;
 		this->saveBestScore();
@@ -119,8 +113,7 @@ void Game::render() {
 	this->window->draw(this->bestScoreTitle);
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			this->window->draw(cellsColor[i][j]);
-			this->window->draw(cellsText[i][j]);
+			cells[i][j].draw(window);
 		}
 	}
 	this->window->display();
@@ -133,7 +126,7 @@ void Game::renderText(Text& text, string str, Color color, int fontSize, int x, 
 	text.setFillColor(color);
 	text.setPosition(x, y);
 }
-
+/*
 string Game::pointToString(int point) {
 	return (point == 0 ? "" : to_string(point));
 }
@@ -179,19 +172,19 @@ Color Game::getCellColor(int val) {
 void Game::updateCells() {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			this->cellsColor[i][j].setFillColor(this->getCellColor(this->table[i][j]));
+			cellsColor[i][j].setFillColor(this->getCellColor(this->table[i][j]));
 			this->renderText(this->cellsText[i][j], pointToString(this->table[i][j]), (this->table[i][j] <= 4 ? Color(108, 99, 91) : Color::White), this->getFontSize(table[i][j]), this->coor[j], this->coor[i]);
 			this->cellsText[i][j].setPosition(this->coorText[j] - this->cellsText[i][j].getLocalBounds().width / 2, this->coorText[i] - this->cellsText[i][j].getLocalBounds().height);
 		}
 	}
 }
-
+*/
 void Game::moving_animation(int i, int j, int u, int v) {
-	table[u][v] = 0;
+	cells[u][v] = 0;
 	update();
 
-	RectangleShape cell = cellsColor[i][j];
-	Vector2f posCell = cellsColor[u][v].getPosition();
+	RectangleShape cell = cells[i][j].getShape();
+	Vector2f posCell = cells[u][v].getShape().getPosition();
 	Vector2f posCOld= cell.getPosition();
 	Time delay = milliseconds(0.08);
 
@@ -218,20 +211,19 @@ void Game::moving_animation(int i, int j, int u, int v) {
 		for (int _i = 0; _i < 4; _i++) {
 			for (int _j = 0; _j < 4; _j++) {
 				if (_i == i && _j == j) continue;
-				window->draw(cellsColor[_i][_j]);
-				window->draw(cellsText[_i][_j]);
+				cells[_i][_j].draw(window);
 			}
 		}
 		
 		window->draw(cell);
-		window->draw(cellsText[i][j]);
+		window->draw(cells[i][j].getText());
 		window->display();
 	}
 }
 
 void Game::newcell_animation(int u, int v) {
 	update();
-	RectangleShape cell = cellsColor[u][v];
+	RectangleShape cell = cells[u][v].getShape();
 	Vector2f posCell = cell.getPosition();
 	Time delay = milliseconds(18);
 
@@ -258,12 +250,11 @@ void Game::newcell_animation(int u, int v) {
 		for (int _i = 0; _i < 4; _i++) {
 			for (int _j = 0; _j < 4; _j++) {
 				if (_i == u && _j == v) continue;
-				window->draw(cellsColor[_i][_j]);
-				window->draw(cellsText[_i][_j]);
+				cells[_i][_j].draw(window);
 			}
 		}
 		window->draw(cell);
-		window->draw(cellsText[u][v]);
+		window->draw(cells[u][v].getText());
 		window->display();
 	}
 }
@@ -272,7 +263,7 @@ void Game::newCells() {
 	int emptyCells = 0;
 	for (int i = 0; i < 4; ++i)
 		for (int j = 0; j < 4; ++j)
-			emptyCells += (table[i][j] == 0);
+			emptyCells += (cells[i][j] == 0);
 
 	if (emptyCells == 0) {
 
@@ -282,8 +273,8 @@ void Game::newCells() {
 
 	for (int i = 0; i < 4; ++i)
 		for (int j = 0; j < 4; ++j)
-			if (table[i][j] == 0 && --emptyCells == randCells) {
-				table[i][j] = 1 << (rand() % 2 + 1);
+			if (cells[i][j] == 0 && --emptyCells == randCells) {
+				cells[i][j] = 1 << (rand() % 2 + 1);
 				newcell_animation(i, j);
 				return;
 			}
@@ -295,27 +286,27 @@ bool Game::moveLeft() {
 	bool moved = 0;
 	for (int j = 1; j < 4; ++j) 
 		for (int i = 0; i < 4; ++i) 
-			if (table[i][j] != 0) {
+			if (cells[i][j] != 0) {
 				for (int k = j - 1; k >= 0; --k) {
-					if (table[i][k] != table[i][j] && table[i][k]) {
-						table[i][k + 1] = table[i][j];
+					if (cells[i][k] != cells[i][j] && cells[i][k] != 0) {
+						cells[i][k + 1] = cells[i][j];
 						if (k + 1 != j) {
 							moving_animation(i, k + 1, i, j);
 						}
 						else break;
 					}
-					else if (table[i][k] == table[i][j]) {
-						table[i][k] += table[i][j];
-						score += table[i][j];
+					else if (cells[i][k] == cells[i][j]) {
+						cells[i][k] += cells[i][j];
+						score += cells[i][j].getVal();
 						moving_animation(i, k, i, j);
 					}
-					else if (k == 0 && table[i][0] == 0) {
-						table[i][0] = table[i][j];
+					else if (k == 0 && cells[i][0] == 0) {
+						cells[i][0] = cells[i][j];
 						moving_animation(i, 0, i, j);
 					}
 					else continue;
 
-					moved |= (table[i][j] == 0);
+					moved |= (cells[i][j] == 0);
 					break;
 				}
 			}
@@ -328,27 +319,27 @@ bool Game::moveRight() {
 	bool moved = 0;
 	for (int j = 2; j >= 0; --j)
 		for (int i = 0; i < 4; ++i)
-			if (table[i][j] != 0) {
+			if (cells[i][j] != 0) {
 				for (int k = j + 1; k < 4; ++k) {
-					if (table[i][k] != table[i][j] && table[i][k]) {
-						table[i][k - 1] = table[i][j];
+					if (cells[i][k] != cells[i][j] && cells[i][k] != 0) {
+						cells[i][k - 1] = cells[i][j];
 						if (k - 1 != j) {
 							moving_animation(i, k - 1, i, j);
 						}
 						else  break;
 					} 
-					else if (table[i][k] == table[i][j]) {
-						table[i][k] += table[i][j];
-						score += table[i][j];
+					else if (cells[i][k] == cells[i][j]) {
+						cells[i][k] += cells[i][j];
+						score += cells[i][j].getVal();
 						moving_animation(i, k, i, j);
 					}
-					else if(k == 3 && table[i][3] == 0) {
-						table[i][3] = table[i][j];
+					else if(k == 3 && cells[i][3] == 0) {
+						cells[i][3] = cells[i][j];
 						moving_animation(i, 3, i, j);
 					}
 					else continue;
 
-					moved |= (table[i][j] == 0);
+					moved |= (cells[i][j] == 0);
 					break;
 				}
 			}
@@ -361,27 +352,27 @@ bool Game::moveUp() {
 	bool moved = 0;
 	for (int i = 1; i < 4; ++i)
 		for (int j = 0; j < 4; ++j)
-			if (table[i][j] != 0) {
+			if (cells[i][j] != 0) {
 				for (int k = i - 1; k >= 0; --k) {
-					if (table[k][j] != table[i][j] && table[k][j]) {
-						table[k + 1][j] = table[i][j];
+					if (cells[k][j] != cells[i][j] && cells[k][j] != 0) {
+						cells[k + 1][j] = cells[i][j];
 						if (k + 1 != i) {
 							moving_animation(k + 1, j, i, j);
 						}
 						else  break;
 					}
-					else if (table[k][j] == table[i][j]) {
-						table[k][j] += table[i][j];
-						score += table[i][j];
+					else if (cells[k][j] == cells[i][j]) {
+						cells[k][j] += cells[i][j];
+						score += cells[i][j].getVal();
 						moving_animation(k, j, i, j);
 					}
-					else if (k == 0 && table[0][j] == 0) {
-						table[0][j] = table[i][j];
+					else if (k == 0 && cells[0][j] == 0) {
+						cells[0][j] = cells[i][j];
 						moving_animation(k, j, i, j);
 					}
 					else continue;
 
-					moved |= (table[i][j] == 0);
+					moved |= (cells[i][j] == 0);
 					break;
 				}
 			}
@@ -394,27 +385,27 @@ bool Game::moveDown() {
 	bool moved = 0;
 	for (int i = 2; i >= 0; --i)
 		for (int j = 0; j < 4; ++j)
-			if (table[i][j] != 0) {
+			if (cells[i][j] != 0) {
 				for (int k = i + 1; k < 4; ++k) {
-					if (table[k][j] != table[i][j] && table[k][j]) {
-						table[k - 1][j] = table[i][j];
+					if (cells[k][j] != cells[i][j] && cells[k][j] != 0) {
+						cells[k - 1][j] = cells[i][j];
 						if (k - 1 != i) {
 							moving_animation(k - 1, j, i, j);
 						}
 						else  break;
 					}
-					else if (table[k][j] == table[i][j]) {
-						table[k][j] += table[i][j];
-						score += table[i][j];
+					else if (cells[k][j] == cells[i][j]) {
+						cells[k][j] += cells[i][j];
+						score += cells[i][j].getVal();
 						moving_animation(k, j, i, j);
 					}
-					else if (k == 3 && table[3][j] == 0) {
-						table[3][j] = table[i][j];
+					else if (k == 3 && cells[3][j] == 0) {
+						cells[3][j] = cells[i][j];
 						moving_animation(3, j, i, j);
 					}
 					else continue;
 
-					moved |= (table[i][j] == 0);
+					moved |= (cells[i][j] == 0);
 					break;
 				}
 			}
@@ -423,14 +414,14 @@ bool Game::moveDown() {
 
 bool Game::isLose() {
 	int check = -1;
-	for (int i = 0; i < 4; i++)
-		for (int j = 0; j < 3; j++)
-			if (this->table[i][j] == this->table[i][j + 1])
-				check++;
-	for (int j = 0; j < 4; j++)
-		for (int i = 0; i < 3; i++)
-			if (this->table[i][j] == this->table[i + 1][j])
-				check++;
+	//for (int i = 0; i < 4; i++)
+	//	for (int j = 0; j < 3; j++)
+	//		if (this->table[i][j] == this->table[i][j + 1])
+	//			check++;
+	//for (int j = 0; j < 4; j++)
+	//	for (int i = 0; i < 3; i++)
+	//		if (this->table[i][j] == this->table[i + 1][j])
+	//			check++;
 	return check < 0;
 }
 
@@ -452,26 +443,26 @@ void Game::loadBestScore() {
 }
 
 void Game::saveTable() {
-	fstream fTemp;
-	fTemp.open("data/temp.txt", ios::out);
+	//fstream fTemp;
+	//fTemp.open("data/temp.txt", ios::out);
 
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			fTemp << this->table[i][j] << " ";
-		}
-		fTemp << endl;
-	}
-	fTemp.close();
-	remove("data/table.txt");
-	rename("data/temp.txt", "data/table.txt");
+	//for (int i = 0; i < 4; i++) {
+	//	for (int j = 0; j < 4; j++) {
+	//		fTemp << this->table[i][j] << " ";
+	//	}
+	//	fTemp << endl;
+	//}
+	//fTemp.close();
+	//remove("data/table.txt");
+	//rename("data/temp.txt", "data/table.txt");
 }
 
 void Game::loadTable() {
-	fstream f;
-	f.open("data/table.txt");
-	if (!f.is_open()) return;
-	for (int i = 0; i < 4; i++)
-		for (int j = 0; j < 4; j++)
-			f >> this->table[i][j];
-	f.close();
+	//fstream f;
+	//f.open("data/table.txt");
+	//if (!f.is_open()) return;
+	//for (int i = 0; i < 4; i++)
+	//	for (int j = 0; j < 4; j++)
+	//		f >> this->table[i][j];
+	//f.close();
 }
