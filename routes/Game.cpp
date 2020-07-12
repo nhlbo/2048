@@ -4,10 +4,10 @@
 // this->window = ...	  <=>  window = ...
 
 Game::Game() {
+	firstLoad = true;
 	bestScore = 0;
 	srand(time(NULL));
 	this->loadBestScore();
-	this->loadTable();
 	font.loadFromFile("data/ClearSans-Bold.ttf");
 	this->window = new RenderWindow(VideoMode(670, 470), "2048", Style::Titlebar | Style::Close);
 	this->backgroundTable.setSize(Vector2f(450, 450));
@@ -43,10 +43,12 @@ void Game::start() {
 	this->newGame();
 	while (this->window->isOpen()) {
 		Event e;
-		
 		while (window->pollEvent(e)) {
 			bool moved = 0;
-			if (e.type == Event::Closed) window->close();
+			if (e.type == Event::Closed) {
+				this->saveTable();
+				window->close();
+			}
 			else if (e.type == Event::KeyPressed) {
 				if (e.key.code == Keyboard::Left || e.key.code == Keyboard::A) moved |= this->moveLeft();
 				if (e.key.code == Keyboard::Right || e.key.code == Keyboard::D) moved |= this->moveRight();
@@ -83,6 +85,10 @@ void Game::newGame() {
 				break;
 			}
 		}
+	}
+	if (this->firstLoad) {
+		this->firstLoad = false;
+		this->loadTable();
 	}
 	this->update();
 	this->render();
@@ -415,52 +421,7 @@ bool Game::moveDown() {
 	return moved;
 }
 
-void Game::saveBestScore() {
-	fstream f;
-	remove("assets/best_score.txt");
-	f.open("assets/best_score.txt", ios::out);
-	f << this->score;
-	f.close();
-}
-
-void Game::loadBestScore() {
-	int s;
-	fstream f;
-	f.open("assets/best_score.txt", ios::in);
-	f >> s;
-	f.close();
-	s != 0 ? this->bestScore = s : this->bestScore = 0;
-}
-
-void Game::saveTable() {
-	fstream fTemp;
-	fTemp.open("assets/temp.txt", ios::out);
-
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			fTemp << this->table[i][j] << " ";
-		}
-		fTemp << endl;
-	}
-	fTemp.close();
-	remove("assets/table.txt");
-	rename("assets/temp.txt", "assets/table.txt");
-}
-
-void Game::loadTable() {
-	int temp[4][4];
-	fstream f;
-	f.open("assets/table.txt");
-	for (int i = 0; i < 4; i++)
-		for (int j = 0; j < 4; j++)
-			f >> temp[i][j];
-	f.close();
-
-	for (int i = 0; i < 4; i++)
-		for (int j = 0; j < 4; j++)
-			if (this->table[i][j] == 0)
-				return;
-
+bool Game::isLose() {
 	int check = -1;
 	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 3; j++)
@@ -470,6 +431,47 @@ void Game::loadTable() {
 		for (int i = 0; i < 3; i++)
 			if (this->table[i][j] == this->table[i + 1][j])
 				check++;
-	if (check < 0)
-		this->isLose = true;
+	return check < 0;
+}
+
+void Game::saveBestScore() {
+	fstream f;
+	remove("data/best_score.txt");
+	f.open("data/best_score.txt", ios::out);
+	f << this->score;
+	f.close();
+}
+
+void Game::loadBestScore() {
+	int s;
+	fstream f;
+	f.open("data/best_score.txt", ios::in);
+	f >> s;
+	f.close();
+	s != 0 ? this->bestScore = s : this->bestScore = 0;
+}
+
+void Game::saveTable() {
+	fstream fTemp;
+	fTemp.open("data/temp.txt", ios::out);
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			fTemp << this->table[i][j] << " ";
+		}
+		fTemp << endl;
+	}
+	fTemp.close();
+	remove("data/table.txt");
+	rename("data/temp.txt", "data/table.txt");
+}
+
+void Game::loadTable() {
+	fstream f;
+	f.open("data/table.txt");
+	if (!f.is_open()) return;
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4; j++)
+			f >> this->table[i][j];
+	f.close();
 }
