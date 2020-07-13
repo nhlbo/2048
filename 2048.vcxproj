@@ -146,11 +146,13 @@
     <ClCompile Include="routes\Cell.cpp" />
     <ClCompile Include="routes\csv.cpp" />
     <ClCompile Include="routes\Game.cpp" />
+    <ClCompile Include="routes\Title.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="controls\Cell.h" />
     <ClInclude Include="controls\csv.h" />
     <ClInclude Include="controls\Game.h" />
+    <ClInclude Include="controls\Title.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,12 +4,20 @@
 // this->window = ...	  <=>  window = ...
 
 Game::Game() {
+	skin.loadFromFile("data/texture/classical/background.png");
+	skin_b.loadFromFile("data/texture/classical/board8x8.png");
+	m_size_i = 2;	// 0(4x4), 1(6x6), 2(8x8)
+	m_size = 4 + 2 * m_size_i;
+	background.setTexture(skin);
+	board.setTexture(skin_b);
+	Cell::setSize(size[m_size_i][2], size[m_size_i][2]);
+
 	firstLoad = true;
 	bestScore = 0;
 	srand(time(NULL));
 	this->loadBestScore();
 	font.loadFromFile("data/ClearSans-Bold.ttf");
-	this->window = new RenderWindow(VideoMode(670, 470), "2048", Style::Titlebar | Style::Close);
+	this->window = new RenderWindow(VideoMode(950, 720), "2048", Style::Titlebar | Style::Close);
 	this->backgroundTable.setSize(Vector2f(450, 450));
 	this->backgroundTable.setFillColor(Color(179, 164, 151));
 	this->backgroundTable.setPosition(10, 10);
@@ -23,11 +31,12 @@ Game::Game() {
 	this->bestScoreBoard.setFillColor(Color(177, 164, 152));
 	this->bestScoreBoard.setPosition(510, 200);
 
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
+	for (int i = 0; i < m_size; i++) {
+		for (int j = 0; j < m_size; j++) {
 			// class::Cell
-			cells[i][j].setPosition(coor[j], coor[i]);
-			cells[i][j].setPositionText(coorText[j], coorText[i]);
+			//cells[i][j].setPosition(coor[j], coor[i]);
+			cells[i][j].setPosition(size[m_size_i][0] + (size[m_size_i][2] + LINE_SIZE) * j, size[m_size_i][1] + (size[m_size_i][2] + LINE_SIZE) * i);
+			//cells[i][j].setPositionText(coorText[j], coorText[i]);
 		}
 	}
 	this->renderText(this->newGameTitle, "New Game", Color::White, 15, 527, 75);
@@ -47,7 +56,7 @@ void Game::start() {
 		Event e;
 		while (window->pollEvent(e)) {
 			bool moved = 0;
-			if (e.type == Event::Closed) {
+			if (e.type == Event::Closed || (e.type == Event::KeyPressed && e.key.code == Keyboard::Escape)) {
 				this->saveTable();
 				window->close();
 			}
@@ -76,8 +85,8 @@ void Game::start() {
 
 void Game::newGame() {
 	this->score = 0;
-	for (int i = 0; i < 4; i++)
-		for (int j = 0; j < 4; j++) cells[i][j] = 0;
+	for (int i = 0; i < m_size; i++)
+		for (int j = 0; j < m_size; j++) cells[i][j] = 0;
 	newCells();
 	newCells();
 	if (this->firstLoad) {
@@ -102,6 +111,7 @@ void Game::update() {
 
 void Game::render() {
 	this->window->clear(Color::White);
+	/*/
 	this->window->draw(backgroundTable);
 	this->window->draw(newGameButton);
 	this->window->draw(this->newGameTitle);
@@ -111,11 +121,15 @@ void Game::render() {
 	this->window->draw(this->bestScoreBoard);
 	this->window->draw(this->bestScoreBoardTitle);
 	this->window->draw(this->bestScoreTitle);
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
+	//*/
+	window->draw(background);
+	
+	for (int i = 0; i < m_size; i++) {
+		for (int j = 0; j < m_size; j++) {
 			cells[i][j].draw(window);
 		}
 	}
+	window->draw(board);
 	this->window->display();
 }
 
@@ -131,46 +145,41 @@ void Game::moving_animation(int i, int j, int u, int v) {
 	cells[u][v] = 0;
 	update();
 
+	int n_moves = 5;
+
 	RectangleShape cell = cells[i][j].getShape();
 	Vector2f posCell = cells[u][v].getShape().getPosition();
 	Vector2f posCOld= cell.getPosition();
 	Time delay = milliseconds(0.08);
 
-	while (posCell != posCOld) {
-		if (posCell.x != posCOld.x) {
-			posCell.x += (posCell.x < posCOld.x) ? 11 : -11;
-		}
-		if (posCell.y != posCOld.y) {
-			posCell.y += (posCell.y < posCOld.y) ? 11 : -11;
-		}
+	float dx = posCOld.x - posCell.x;
+	float dy = posCOld.y - posCell.y;
+	dx /= n_moves; dy /= n_moves;
+
+	for (int move = 0; move < n_moves; ++move){
+		posCell.x += dx;
+		posCell.y += dy;
 		cell.setPosition(posCell);
 
 		sleep(delay);
 		window->clear(Color::White);
-		window->draw(backgroundTable);
-		window->draw(newGameButton);
-		window->draw(newGameTitle);
-		window->draw(scoreBoard);
-		window->draw(scoreBoardTitle);
-		window->draw(scoreTitle);
-		window->draw(bestScoreBoard);
-		window->draw(bestScoreBoardTitle);
-		window->draw(bestScoreTitle);
-		for (int _i = 0; _i < 4; _i++) {
-			for (int _j = 0; _j < 4; _j++) {
+		window->draw(background);
+
+		for (int _i = 0; _i < m_size; _i++) {
+			for (int _j = 0; _j < m_size; _j++) {
 				if (_i == i && _j == j) continue;
 				cells[_i][_j].draw(window);
 			}
 		}
 		
 		window->draw(cell);
-		window->draw(cells[i][j].getText());
+		window->draw(board);
 		window->display();
 	}
 }
 
 void Game::newcell_animation(int u, int v) {
-	update();
+	//update();
 	RectangleShape cell = cells[u][v].getShape();
 	Vector2f posCell = cell.getPosition();
 	Time delay = milliseconds(18);
@@ -179,38 +188,32 @@ void Game::newcell_animation(int u, int v) {
 	posCell.y += 25;
 
 	for (int i = 50; i >= 0; i -= 10) {
-		cell.setSize(Vector2f(100 - i, 100 - i));
+		cell.setSize(Vector2f(size[m_size_i][2] - i, size[m_size_i][2] - i));
 		cell.setPosition(posCell);
 		posCell.x -= 5;
 		posCell.y -= 5;
 
 		sleep(delay);
 		window->clear(Color::White);
-		window->draw(backgroundTable);
-		window->draw(newGameButton);
-		window->draw(newGameTitle);
-		window->draw(scoreBoard);
-		window->draw(scoreBoardTitle);
-		window->draw(scoreTitle);
-		window->draw(bestScoreBoard);
-		window->draw(bestScoreBoardTitle);
-		window->draw(bestScoreTitle);
-		for (int _i = 0; _i < 4; _i++) {
-			for (int _j = 0; _j < 4; _j++) {
+		window->draw(background);
+		
+		for (int _i = 0; _i < m_size; _i++) {
+			for (int _j = 0; _j < m_size; _j++) {
 				if (_i == u && _j == v) continue;
 				cells[_i][_j].draw(window);
 			}
 		}
+
 		window->draw(cell);
-		window->draw(cells[u][v].getText());
+		window->draw(board);
 		window->display();
 	}
 }
 
 void Game::newCells() {
 	int emptyCells = 0;
-	for (int i = 0; i < 4; ++i)
-		for (int j = 0; j < 4; ++j)
+	for (int i = 0; i < m_size; ++i)
+		for (int j = 0; j < m_size; ++j)
 			emptyCells += (cells[i][j] == 0);
 
 	if (emptyCells == 0) {
@@ -219,8 +222,8 @@ void Game::newCells() {
 	}
 	int randCells = rand() % emptyCells;
 
-	for (int i = 0; i < 4; ++i)
-		for (int j = 0; j < 4; ++j)
+	for (int i = 0; i < m_size; ++i)
+		for (int j = 0; j < m_size; ++j)
 			if (cells[i][j] == 0 && --emptyCells == randCells) {
 				cells[i][j] = 1 << (rand() % 2 + 1);
 				newcell_animation(i, j);
@@ -229,11 +232,10 @@ void Game::newCells() {
 }
 
 bool Game::moveLeft() {
-	cerr << "Press Left" << endl;
-
+	//cerr << "Press Left" << endl;
 	bool moved = 0;
-	for (int j = 1; j < 4; ++j) 
-		for (int i = 0; i < 4; ++i) 
+	for (int j = 1; j < m_size; ++j)
+		for (int i = 0; i < m_size; ++i)
 			if (cells[i][j] != 0) {
 				for (int k = j - 1; k >= 0; --k) {
 					if (cells[i][k] != cells[i][j] && cells[i][k] != 0) {
@@ -245,12 +247,12 @@ bool Game::moveLeft() {
 					}
 					else if (cells[i][k] == cells[i][j]) {
 						cells[i][k] += cells[i][j];
-						score += cells[i][j].getVal();
+						score += cells[i][j].getVal() / (1 << m_size_i);	// bigger is small score
 						moving_animation(i, k, i, j);
 					}
-					else if (k == 0 && cells[i][0] == 0) {
-						cells[i][0] = cells[i][j];
-						moving_animation(i, 0, i, j);
+					else if (k == 0 && cells[i][k] == 0) {
+						cells[i][k] = cells[i][j];
+						moving_animation(i, k, i, j);
 					}
 					else continue;
 
@@ -262,13 +264,12 @@ bool Game::moveLeft() {
 }
 
 bool Game::moveRight() {
-	cerr << "Press Right" << endl;
-
+	//cerr << "Press Right" << endl;
 	bool moved = 0;
-	for (int j = 2; j >= 0; --j)
-		for (int i = 0; i < 4; ++i)
+	for (int j = m_size - 2; j >= 0; --j)
+		for (int i = 0; i < m_size; ++i)
 			if (cells[i][j] != 0) {
-				for (int k = j + 1; k < 4; ++k) {
+				for (int k = j + 1; k < m_size; ++k) {
 					if (cells[i][k] != cells[i][j] && cells[i][k] != 0) {
 						cells[i][k - 1] = cells[i][j];
 						if (k - 1 != j) {
@@ -278,12 +279,12 @@ bool Game::moveRight() {
 					} 
 					else if (cells[i][k] == cells[i][j]) {
 						cells[i][k] += cells[i][j];
-						score += cells[i][j].getVal();
+						score += cells[i][j].getVal() / (1 << m_size_i);	// bigger is small score
 						moving_animation(i, k, i, j);
 					}
-					else if(k == 3 && cells[i][3] == 0) {
-						cells[i][3] = cells[i][j];
-						moving_animation(i, 3, i, j);
+					else if(k == m_size - 1 && cells[i][k] == 0) {
+						cells[i][k] = cells[i][j];
+						moving_animation(i, k, i, j);
 					}
 					else continue;
 
@@ -295,11 +296,10 @@ bool Game::moveRight() {
 }
 
 bool Game::moveUp() {
-	cerr << "Press Up" << endl;
-
+	//cerr << "Press Up" << endl;
 	bool moved = 0;
-	for (int i = 1; i < 4; ++i)
-		for (int j = 0; j < 4; ++j)
+	for (int i = 1; i < m_size; ++i)
+		for (int j = 0; j < m_size; ++j)
 			if (cells[i][j] != 0) {
 				for (int k = i - 1; k >= 0; --k) {
 					if (cells[k][j] != cells[i][j] && cells[k][j] != 0) {
@@ -311,11 +311,11 @@ bool Game::moveUp() {
 					}
 					else if (cells[k][j] == cells[i][j]) {
 						cells[k][j] += cells[i][j];
-						score += cells[i][j].getVal();
+						score += cells[i][j].getVal() / (1 << m_size_i);	// bigger is small score
 						moving_animation(k, j, i, j);
 					}
-					else if (k == 0 && cells[0][j] == 0) {
-						cells[0][j] = cells[i][j];
+					else if (k == 0 && cells[k][j] == 0) {
+						cells[k][j] = cells[i][j];
 						moving_animation(k, j, i, j);
 					}
 					else continue;
@@ -328,13 +328,12 @@ bool Game::moveUp() {
 }
 
 bool Game::moveDown() {
-	cerr << "Press Down" << endl;
-
+	//cerr << "Press Down" << endl;
 	bool moved = 0;
-	for (int i = 2; i >= 0; --i)
-		for (int j = 0; j < 4; ++j)
+	for (int i = m_size - 2; i >= 0; --i)
+		for (int j = 0; j < m_size; ++j)
 			if (cells[i][j] != 0) {
-				for (int k = i + 1; k < 4; ++k) {
+				for (int k = i + 1; k < m_size; ++k) {
 					if (cells[k][j] != cells[i][j] && cells[k][j] != 0) {
 						cells[k - 1][j] = cells[i][j];
 						if (k - 1 != i) {
@@ -344,12 +343,12 @@ bool Game::moveDown() {
 					}
 					else if (cells[k][j] == cells[i][j]) {
 						cells[k][j] += cells[i][j];
-						score += cells[i][j].getVal();
+						score += cells[i][j].getVal() / (1 << m_size_i);	// bigger is small score
 						moving_animation(k, j, i, j);
 					}
-					else if (k == 3 && cells[3][j] == 0) {
-						cells[3][j] = cells[i][j];
-						moving_animation(3, j, i, j);
+					else if (k == m_size - 1 && cells[k][j] == 0) {
+						cells[k][j] = cells[i][j];
+						moving_animation(k, j, i, j);
 					}
 					else continue;
 
