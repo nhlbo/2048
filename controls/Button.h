@@ -14,10 +14,18 @@ class Button {
 public:
 	Button();
 	sf::Vector2f getPosition();
-	void setSize(float width, float height);
+	void setTexture(const std::string& _texture);
 	void setTexture(const char* _texture);
-	void setPosition(float x, float y);
+	template<class T> void setSize(std::pair<T, T> size) {
+		m_shape.setSize(sf::Vector2f(size.first, size.second));
+		m_shape.setTextureRect(sf::IntRect(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT));
+	}
+	template<class T> void setPosition(std::pair<T, T> pos) {
+		m_shape.setPosition(sf::Vector2f(pos.first, pos.second));
+	}
+	
 	bool clicked(sf::RenderWindow* window);
 	void draw(sf::RenderWindow* window);
 };
 #endif
+

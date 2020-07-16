@@ -1,8 +1,10 @@
 #ifndef GAME_H
 #define GAME_H
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <fstream>
+#include "Resourcepack.h"
 #include "Cell.h"
 #include "Button.h"
 
@@ -27,15 +29,22 @@ private:
 	int m_size;		// MAX 8
 
 	RenderWindow* window;
+	Music music_background;
+	Resourcepack res;
 	Font font;
-	Texture skin, skin_b;
-	Sprite background, frame;
+
+	Texture skin_0, skin, skin_b;
+	Sprite mainmenu, background, frame;
 	Button newGameButton, scoreBoard, bestScoreBoard, loseBoard;
 	Text scoreTitle, bestScoreTitle;
 	Cell cells[8][8];
 	
 	int score, bestScore;
 	bool firstLoad;
+	bool isMainMenu;
+
+	// Resourcepacks function
+	bool loadResourcepack(const char* pack_name = "classical");
 
 	// RenderWindow function: clear, draw, display
 	void clear(Color color = Color(0, 0, 0, 255));
@@ -66,6 +75,5 @@ private:
 	void loadBestScore();
 	void saveTable();
 	void loadTable();
-
 };
 #endif

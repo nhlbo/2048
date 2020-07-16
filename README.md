@@ -21,7 +21,10 @@ End Project Date:
   - **Facebook:** [<username>](https://www.facebook.com/)
   - **Email:** <e-mail>
 ## Project Planner
-- [x] **All roles**
-- [x] **...**
-- [x] **...**
+- [x] **Setup and using SFML lybrary**
+- [x] **Core function**
+- [x] **Update more option**
+- [] **Make resourcepacks**
+- [] **Load resourcepacks**
 ## How to play ?
+Use your arrow keys to move the tiles. When two tiles with the same number touch, they merge into one!

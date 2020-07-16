@@ -8,17 +8,12 @@ sf::Vector2f Button::getPosition() {
 	return m_shape.getPosition();
 }
 
-void Button::setSize(float width, float height) {
-	m_shape.setSize(sf::Vector2f(width, height));
-	m_shape.setTextureRect(sf::IntRect(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT));
+void Button::setTexture(const std::string& _texture) {
+	m_texture.loadFromFile(_texture);
 }
 
 void Button::setTexture(const char* _texture) {
 	m_texture.loadFromFile(_texture);
-}
-
-void Button::setPosition(float x, float y) {
-	m_shape.setPosition(sf::Vector2f(x, y));
 }
 
 bool Button::clicked(sf::RenderWindow* window) {

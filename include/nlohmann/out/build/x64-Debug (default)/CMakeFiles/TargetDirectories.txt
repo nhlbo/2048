@@ -1,0 +1,2 @@
+C:/Users/admin/source/repos/2048/include/nlohmann/out/build/x64-Debug (default)/CMakeFiles/edit_cache.dir
+C:/Users/admin/source/repos/2048/include/nlohmann/out/build/x64-Debug (default)/CMakeFiles/rebuild_cache.dir

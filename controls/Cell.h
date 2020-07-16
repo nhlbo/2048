@@ -30,6 +30,7 @@ public:
 	sf::Vector2f getPosition();
 	int getVal();
 	static void setSize(float width, float height);
+	static void setTexture(const std::string _texture);
 	static void setTexture(const char* _texture);
 	void setPosition(float x, float y);
 	void setOutlineThickness(float thickness);
