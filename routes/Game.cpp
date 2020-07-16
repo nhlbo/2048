@@ -9,30 +9,12 @@ Game::Game() {
 	m_size_i = 0;	// 0(4x4), 1(6x6), 2(8x8)
 	m_size = 4 + 2 * m_size_i;
 
-	// load texture (new add function change size and skin
-	font.loadFromFile("data/texture/classical/ClearSans-Bold.ttf");
-	skin.loadFromFile("data/texture/classical/background.png");
-	skin_b.loadFromFile("data/texture/classical/frame4x4.png");
-	newGameButton.setTexture("data/texture/classical/newgame.png");
-	scoreBoard.setTexture("data/texture/classical/score.png");
-	bestScoreBoard.setTexture("data/texture/classical/bestscore.png");
-	
-	Cell::setSize(size[m_size_i][2], size[m_size_i][2]);
+	isMainMenu = true;
 	firstLoad = true;
 	bestScore = 0;
 	srand(time(NULL));
 	loadBestScore();
 
-	// add texture to m_member
-	background.setTexture(skin);
-	frame.setTexture(skin_b);
-	newGameButton.setSize(110, 32);
-	newGameButton.setPosition(710, 70);
-	scoreBoard.setSize(110, 50);
-	scoreBoard.setPosition(710, 130);
-	bestScoreBoard.setSize(110, 50);
-	bestScoreBoard.setPosition(710, 200);
-	
 	for (int i = 0; i < m_size; i++) {
 		for (int j = 0; j < m_size; j++) {
 			cells[i][j].setPosition(size[m_size_i][0] + (size[m_size_i][2] + LINE_SIZE) * j, size[m_size_i][1] + (size[m_size_i][2] + LINE_SIZE) * i);
@@ -45,33 +27,74 @@ Game::~Game() {
 }
 
 void Game::start() {
-	this->newGame();
+	if (loadResourcepack() == 0) {
+		window->close();
+		return;
+	}
+	music_background.play();
 	while (this->window->isOpen()) {
+		if (music_background.getStatus() == sf::Sound::Status::Stopped) {
+			music_background.openFromFile(res.getNextSound("music"));
+			music_background.play();
+		}
 		Event e;
-		while (window->pollEvent(e)) {
-			bool moved = 0;
+		while (window->pollEvent(e)) {	
 			if (e.type == Event::Closed || (e.type == Event::KeyPressed && e.key.code == Keyboard::Escape)) {
 				this->saveTable();
 				window->close();
+				music_background.stop();
 			}
-			else if (e.type == Event::KeyPressed) {
-				if (e.key.code == Keyboard::Left || e.key.code == Keyboard::A) moved |= this->moveLeft();
-				if (e.key.code == Keyboard::Right || e.key.code == Keyboard::D) moved |= this->moveRight();
-				if (e.key.code == Keyboard::Up || e.key.code == Keyboard::W) moved |= this->moveUp();
-				if (e.key.code == Keyboard::Down || e.key.code == Keyboard::S) moved |= this->moveDown();
-			}
-			else if (e.type == Event::MouseButtonReleased) {
-				if (newGameButton.clicked(window)) {
-					newGame();
+			else if (isMainMenu) {
+				draw(mainmenu);
+				draw(newGameButton);
+				display();
+				if (e.type == Event::MouseButtonReleased) {
+					if (newGameButton.clicked(window)) {
+						isMainMenu = false;
+						newGame();
+					}
 				}
 			}
-			if (moved) {
-				for (int i = 1; i <= m_size_i + 1; ++i)
-					newCells();
+			else {
+				bool moved = 0;
+				if (e.type == Event::KeyPressed) {
+					if (e.key.code == Keyboard::Left || e.key.code == Keyboard::A) moved |= this->moveLeft();
+					if (e.key.code == Keyboard::Right || e.key.code == Keyboard::D) moved |= this->moveRight();
+					if (e.key.code == Keyboard::Up || e.key.code == Keyboard::W) moved |= this->moveUp();
+					if (e.key.code == Keyboard::Down || e.key.code == Keyboard::S) moved |= this->moveDown();
+				}
+				else if (e.type == Event::MouseButtonReleased) {
+					if (newGameButton.clicked(window)) {
+						newGame();
+					}
+				}
+				if (moved) {
+					for (int i = 1; i <= m_size_i + 1; ++i)
+						newCells();
+				}
 			}
-			
 		}
 	}
+}
+
+bool Game::loadResourcepack(const char* pack_name) {
+	if (!res.setResourcepack(pack_name)) return 0;
+
+	music_background.openFromFile(res.getNextSound("music"));
+	font.loadFromFile(res.getFont("score"));
+
+	res.setButton(newGameButton, "newgamebutton");
+	res.setButton(scoreBoard, "scoreboard");
+	res.setButton(bestScoreBoard, "bestscoreboard");
+	res.setCell("4x4");
+
+	skin_0.loadFromFile(res.getTexture("mainmenu"));
+	skin.loadFromFile(res.getTexture("background"));
+	skin_b.loadFromFile(res.getTexture("frame", "4x4"));
+
+	mainmenu.setTexture(skin_0);
+	background.setTexture(skin);
+	frame.setTexture(skin_b);
 }
 
 void Game::clear(Color color) { window->clear(color); }
@@ -98,9 +121,9 @@ void Game::newGame() {
 
 void Game::update() {
 	this->renderText(this->scoreTitle, to_string(this->score), Color::White, 15, 565, 165);
-	this->scoreTitle.setPosition(765 - this->scoreTitle.getLocalBounds().width / 2, 155);
+	this->scoreTitle.setPosition(805 - this->scoreTitle.getLocalBounds().width / 2, 155);
 	this->renderText(this->bestScoreTitle, to_string(this->bestScore), Color::White, 15, 565, 235);
-	this->bestScoreTitle.setPosition(765 - this->bestScoreTitle.getLocalBounds().width / 2, 225);
+	this->bestScoreTitle.setPosition(805 - this->bestScoreTitle.getLocalBounds().width / 2, 225);
 
 	if (score > bestScore) {
 		bestScore = score;

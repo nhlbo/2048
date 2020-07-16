@@ -2,7 +2,7 @@
 
 // identify static attributes (default)
 sf::Vector2f Cell::m_size(sf::Vector2f(100, 100));
-sf::Texture Cell::m_skin(creatTexture("data/texture/classical/block.png"));
+sf::Texture Cell::m_skin(creatTexture("resourcepacks/classical/textures/block.png"));
 
 sf::Texture Cell::creatTexture(const char* _texture) {
 	sf::Texture texture;
@@ -57,6 +57,10 @@ int Cell::getVal() {
 
 void Cell::setSize(float width, float height) {
 	Cell::m_size = sf::Vector2f(width, height);
+}
+
+void Cell::setTexture(const std::string _texture) {
+	Cell::m_skin.loadFromFile(_texture);
 }
 
 void Cell::setTexture(const char* _texture) {
