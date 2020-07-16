@@ -95,6 +95,8 @@ bool Game::loadResourcepack(const char* pack_name) {
 	mainmenu.setTexture(skin_0);
 	background.setTexture(skin);
 	frame.setTexture(skin_b);
+
+	return 1;
 }
 
 void Game::clear(Color color) { window->clear(color); }
