@@ -57,6 +57,9 @@ void Game::start() {
 			}
 			else {
 				bool moved = 0;
+				if (isGameOver) {
+					render();
+				}
 				if (e.type == Event::KeyPressed) {
 					if (e.key.code == Keyboard::Left || e.key.code == Keyboard::A) moved |= this->moveLeft();
 					if (e.key.code == Keyboard::Right || e.key.code == Keyboard::D) moved |= this->moveRight();
@@ -66,6 +69,16 @@ void Game::start() {
 				else if (e.type == Event::MouseButtonReleased) {
 					if (newGameButton.clicked(window)) {
 						newGame();
+					}
+					if (isGameOver) {
+						if (tryAgainButton.clicked(window)) {
+							newGame();
+						}
+						else if (backToMenu.clicked(window)) {
+							this->saveTable();
+							isMainMenu = true;
+							break;
+						}
 					}
 				}
 				if (moved) {
@@ -89,6 +102,8 @@ bool Game::loadResourcepack(const char* pack_name) {
 	res.setButton(newGameButton, "newgamebutton");
 	res.setButton(scoreBoard, "scoreboard");
 	res.setButton(bestScoreBoard, "bestscoreboard");
+	res.setButton(tryAgainButton, "tryagain");
+	res.setButton(backToMenu, "backtomenu");
 	res.setCell("4x4");
 
 	skin_0.loadFromFile(res.getTexture("mainmenu"));
@@ -98,6 +113,11 @@ bool Game::loadResourcepack(const char* pack_name) {
 	mainmenu.setTexture(skin_0);
 	background.setTexture(skin);
 	frame.setTexture(skin_b);
+
+	loseBackground.setFillColor(sf::Color(238, 228, 218, 150));
+	loseBackground.setPosition(Vector2f(10, 10));
+	loseBackground.setSize(Vector2f(650, 650));
+	this->renderText(this->loseTitle, "Game Over!", Color(119, 110, 101), 78, 145, 195);
 
 	return 1;
 }
@@ -111,6 +131,7 @@ void Game::draw(Cell& cell){ cell.draw(window); }
 void Game::display() { window->display(); }
 
 void Game::newGame() {
+	this->isGameOver = false;
 	this->score = 0;
 	for (int i = 0; i < m_size; i++)
 		for (int j = 0; j < m_size; j++) cells[i][j] = 0;
@@ -119,6 +140,7 @@ void Game::newGame() {
 	if (this->firstLoad) {
 		this->firstLoad = false;
 		this->loadTable();
+		isLose();
 	}
 	this->update();
 	this->render();
@@ -151,6 +173,14 @@ void Game::render() {
 		}
 	}
 	draw(frame);
+
+	if (isGameOver) {
+		draw(loseBackground);
+		draw(loseTitle);
+		draw(tryAgainButton);
+		draw(backToMenu);
+	}
+
 	display();
 }
 
@@ -407,7 +437,7 @@ bool Game::isLose() {
 		for (int i = 0; i < 3; i++)
 			if (cells[i][j] == cells[i + 1][j])
 				check++;
-	return check < 0;
+	return check < 0 ? isGameOver = true, true : false;
 }
 
 void Game::saveBestScore() {

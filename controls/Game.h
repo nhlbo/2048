@@ -35,13 +35,15 @@ private:
 
 	Texture skin_0, skin, skin_b;
 	Sprite mainmenu, background, frame;
-	Button newGameButton, scoreBoard, bestScoreBoard, loseBoard;
-	Text scoreTitle, bestScoreTitle;
+	RectangleShape loseBackground;
+	Button newGameButton, scoreBoard, bestScoreBoard, tryAgainButton, backToMenu;
+	Text scoreTitle, bestScoreTitle, loseTitle;
 	Cell cells[8][8];
 	
 	int score, bestScore;
 	bool firstLoad;
 	bool isMainMenu;
+	bool isGameOver;
 
 	// Resourcepacks function
 	bool loadResourcepack(const char* pack_name = "classical");
