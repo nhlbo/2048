@@ -71,6 +71,9 @@ void Game::start() {
 				if (moved) {
 					for (int i = 1; i <= m_size_i + 1; ++i)
 						newCells();
+					if (isLose()) {
+						cout << "You Lose" << endl;
+					}
 				}
 			}
 		}
@@ -388,14 +391,22 @@ bool Game::moveDown() {
 
 bool Game::isLose() {
 	int check = -1;
-	//for (int i = 0; i < 4; i++)
-	//	for (int j = 0; j < 3; j++)
-	//		if (this->table[i][j] == this->table[i][j + 1])
-	//			check++;
-	//for (int j = 0; j < 4; j++)
-	//	for (int i = 0; i < 3; i++)
-	//		if (this->table[i][j] == this->table[i + 1][j])
-	//			check++;
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			if (cells[i][j] == 0)
+				return false;
+		}
+	}
+
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 3; j++)
+			if (cells[i][j] == cells[i][j + 1])
+				check++;
+	for (int j = 0; j < 4; j++)
+		for (int i = 0; i < 3; i++)
+			if (cells[i][j] == cells[i + 1][j])
+				check++;
 	return check < 0;
 }
 
@@ -417,26 +428,29 @@ void Game::loadBestScore() {
 }
 
 void Game::saveTable() {
-	//fstream fTemp;
-	//fTemp.open("data/temp.txt", ios::out);
+	fstream fTemp;
+	fTemp.open("data/temp.txt", ios::out);
 
-	//for (int i = 0; i < 4; i++) {
-	//	for (int j = 0; j < 4; j++) {
-	//		fTemp << this->table[i][j] << " ";
-	//	}
-	//	fTemp << endl;
-	//}
-	//fTemp.close();
-	//remove("data/table.txt");
-	//rename("data/temp.txt", "data/table.txt");
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			fTemp << cells[i][j].getVal() << " ";
+		}
+		fTemp << endl;
+	}
+	fTemp.close();
+	remove("data/table.txt");
+	rename("data/temp.txt", "data/table.txt");
 }
 
 void Game::loadTable() {
-	//fstream f;
-	//f.open("data/table.txt");
-	//if (!f.is_open()) return;
-	//for (int i = 0; i < 4; i++)
-	//	for (int j = 0; j < 4; j++)
-	//		f >> this->table[i][j];
-	//f.close();
+	fstream f;
+	f.open("data/table.txt");
+	if (!f.is_open()) return;
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4; j++) {
+			int x;
+			f >> x;
+			cells[i][j] = x;
+		}
+	f.close();
 }
