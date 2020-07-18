@@ -6,8 +6,8 @@
 Game::Game() {
 	window = new RenderWindow(VideoMode(950, 720), "2048", Style::Titlebar | Style::Close);
 
-	m_size_i = 0;	// 0(4x4), 1(6x6), 2(8x8)
-	m_size = 4 + 2 * m_size_i;
+	/*m_size_i = 0;	// 0(4x4), 1(6x6), 2(8x8)
+	m_size = 4 + 2 * m_size_i;*/
 
 	isMainMenu = true;
 	firstLoad = true;
@@ -15,11 +15,11 @@ Game::Game() {
 	srand(time(NULL));
 	loadBestScore();
 
-	for (int i = 0; i < m_size; i++) {
+	/*for (int i = 0; i < m_size; i++) {
 		for (int j = 0; j < m_size; j++) {
 			cells[i][j].setPosition(size[m_size_i][0] + (size[m_size_i][2] + LINE_SIZE) * j, size[m_size_i][1] + (size[m_size_i][2] + LINE_SIZE) * i);
 		}
-	}
+	}*/
 }
 
 Game::~Game() {
@@ -38,7 +38,7 @@ void Game::start() {
 			music_background.play();
 		}
 		Event e;
-		while (window->pollEvent(e)) {	
+		while (window->pollEvent(e)) {
 			if (e.type == Event::Closed || (e.type == Event::KeyPressed && e.key.code == Keyboard::Escape)) {
 				this->saveTable();
 				window->close();
@@ -46,11 +46,28 @@ void Game::start() {
 			}
 			else if (isMainMenu) {
 				draw(mainmenu);
-				draw(newGameButton);
+				draw(_4x4);
+				draw(_6x6);
+				draw(_8x8);
 				display();
 				if (e.type == Event::MouseButtonReleased) {
-					if (newGameButton.clicked(window)) {
+					/*if (newGameButton.clicked(window)) {
 						isMainMenu = false;
+						newGame();
+					}*/
+					if (_4x4.clicked(window)) {
+						isMainMenu = false;
+						setSize(0);
+						newGame();
+					}
+					else if (_6x6.clicked(window)) {
+						isMainMenu = false;
+						setSize(1);
+						newGame();
+					}
+					else if (_8x8.clicked(window)) {
+						isMainMenu = false;
+						setSize(2);
 						newGame();
 					}
 				}
@@ -104,15 +121,18 @@ bool Game::loadResourcepack(const char* pack_name) {
 	res.setButton(bestScoreBoard, "bestscoreboard");
 	res.setButton(tryAgainButton, "tryagain");
 	res.setButton(backToMenu, "backtomenu");
-	res.setCell("4x4");
+	res.setButton(_4x4, "4x4");
+	res.setButton(_6x6, "6x6");
+	res.setButton(_8x8, "8x8");
+	//res.setCell("4x4");
 
 	skin_0.loadFromFile(res.getTexture("mainmenu"));
 	skin.loadFromFile(res.getTexture("background"));
-	skin_b.loadFromFile(res.getTexture("frame", "4x4"));
+	//skin_b.loadFromFile(res.getTexture("frame", "4x4"));
 
 	mainmenu.setTexture(skin_0);
 	background.setTexture(skin);
-	frame.setTexture(skin_b);
+	//frame.setTexture(skin_b);
 
 	loseBackground.setFillColor(sf::Color(238, 228, 218, 150));
 	loseBackground.setPosition(Vector2f(10, 10));
@@ -127,8 +147,43 @@ void Game::draw(RectangleShape& shape) { window->draw(shape); }
 void Game::draw(Sprite& shape) { window->draw(shape); }
 void Game::draw(Button& button) { button.draw(window); }
 void Game::draw(Text& text) { window->draw(text); }
-void Game::draw(Cell& cell){ cell.draw(window); }
+void Game::draw(Cell& cell) { cell.draw(window); }
 void Game::display() { window->display(); }
+
+void Game::setSize(int s) {
+	res.setCell("4x4");
+	skin_b.loadFromFile(res.getTexture("frame", "4x4"));
+	frame.setTexture(skin_b);
+
+	switch (s) {
+	case 0:
+		m_size_i = 0;
+		res.setCell("4x4");
+		skin_b.loadFromFile(res.getTexture("frame", "4x4"));
+		frame.setTexture(skin_b);
+		break;
+	case 1:
+		m_size_i = 1;
+		res.setCell("6x6");
+		skin_b.loadFromFile(res.getTexture("frame", "6x6"));
+		frame.setTexture(skin_b);
+		break;
+	case 2:
+		m_size_i = 2;
+		res.setCell("8x8");
+		skin_b.loadFromFile(res.getTexture("frame", "8x8"));
+		frame.setTexture(skin_b);
+		break;
+	}
+
+
+	m_size = 4 + 2 * m_size_i;
+	for (int i = 0; i < m_size; i++) {
+		for (int j = 0; j < m_size; j++) {
+			cells[i][j].setPosition(size[this->m_size_i][0] + (size[m_size_i][2] + LINE_SIZE) * j, size[m_size_i][1] + (size[m_size_i][2] + LINE_SIZE) * i);
+		}
+	}
+}
 
 void Game::newGame() {
 	this->isGameOver = false;
@@ -166,7 +221,7 @@ void Game::render() {
 	draw(scoreTitle);
 	draw(bestScoreBoard);
 	draw(bestScoreTitle);
-	
+
 	for (int i = 0; i < m_size; i++) {
 		for (int j = 0; j < m_size; j++) {
 			draw(cells[i][j]);
@@ -200,14 +255,14 @@ void Game::moving_animation(int i, int j, int u, int v) {
 
 	RectangleShape cell = cells[i][j].getShape();
 	Vector2f posCell = cells[u][v].getShape().getPosition();
-	Vector2f posCOld= cell.getPosition();
+	Vector2f posCOld = cell.getPosition();
 	Time delay = milliseconds(0.08);
 
 	float dx = posCOld.x - posCell.x;
 	float dy = posCOld.y - posCell.y;
 	dx /= n_moves; dy /= n_moves;
 
-	for (int move = 0; move < n_moves; ++move){
+	for (int move = 0; move < n_moves; ++move) {
 		posCell.x += dx;
 		posCell.y += dy;
 		cell.setPosition(posCell);
@@ -227,7 +282,7 @@ void Game::moving_animation(int i, int j, int u, int v) {
 				draw(cells[_i][_j]);
 			}
 		}
-		
+
 		draw(cell);
 		draw(frame);
 		display();
@@ -256,7 +311,7 @@ void Game::newcell_animation(int u, int v) {
 		draw(scoreTitle);
 		draw(bestScoreBoard);
 		draw(bestScoreTitle);
-		
+
 		for (int _i = 0; _i < m_size; _i++) {
 			for (int _j = 0; _j < m_size; _j++) {
 				if (_i == u && _j == v) continue;
@@ -336,13 +391,13 @@ bool Game::moveRight() {
 							moving_animation(i, k - 1, i, j);
 						}
 						else  break;
-					} 
+					}
 					else if (cells[i][k] == cells[i][j]) {
 						cells[i][k] += cells[i][j];
 						score += cells[i][j].getVal() / (1 << m_size_i);	// bigger is small score
 						moving_animation(i, k, i, j);
 					}
-					else if(k == m_size - 1 && cells[i][k] == 0) {
+					else if (k == m_size - 1 && cells[i][k] == 0) {
 						cells[i][k] = cells[i][j];
 						moving_animation(i, k, i, j);
 					}
@@ -422,19 +477,19 @@ bool Game::moveDown() {
 bool Game::isLose() {
 	int check = -1;
 
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
+	for (int i = 0; i < m_size; i++) {
+		for (int j = 0; j < m_size; j++) {
 			if (cells[i][j] == 0)
 				return false;
 		}
 	}
 
-	for (int i = 0; i < 4; i++)
-		for (int j = 0; j < 3; j++)
+	for (int i = 0; i < m_size; i++)
+		for (int j = 0; j < m_size - 1; j++)
 			if (cells[i][j] == cells[i][j + 1])
 				check++;
-	for (int j = 0; j < 4; j++)
-		for (int i = 0; i < 3; i++)
+	for (int j = 0; j < m_size; j++)
+		for (int i = 0; i < m_size - 1; i++)
 			if (cells[i][j] == cells[i + 1][j])
 				check++;
 	return check < 0 ? isGameOver = true, true : false;
@@ -460,9 +515,9 @@ void Game::loadBestScore() {
 void Game::saveTable() {
 	fstream fTemp;
 	fTemp.open("data/temp.txt", ios::out);
-
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
+	fTemp << m_size << " " << m_size << endl;
+	for (int i = 0; i < m_size; i++) {
+		for (int j = 0; j < m_size; j++) {
 			fTemp << cells[i][j].getVal() << " ";
 		}
 		fTemp << endl;
@@ -476,11 +531,14 @@ void Game::loadTable() {
 	fstream f;
 	f.open("data/table.txt");
 	if (!f.is_open()) return;
-	for (int i = 0; i < 4; i++)
-		for (int j = 0; j < 4; j++) {
-			int x;
-			f >> x;
-			cells[i][j] = x;
-		}
+	int zx, zy;
+	f >> zx >> zy;
+	if (zx == m_size && zy == m_size)
+		for (int i = 0; i < zx; i++)
+			for (int j = 0; j < zy; j++) {
+				int x;
+				f >> x;
+				cells[i][j] = x;
+			}
 	f.close();
 }

@@ -36,10 +36,10 @@ private:
 	Texture skin_0, skin, skin_b;
 	Sprite mainmenu, background, frame;
 	RectangleShape loseBackground;
-	Button newGameButton, scoreBoard, bestScoreBoard, tryAgainButton, backToMenu;
+	Button newGameButton, scoreBoard, bestScoreBoard, tryAgainButton, backToMenu, _4x4, _6x6, _8x8;
 	Text scoreTitle, bestScoreTitle, loseTitle;
 	Cell cells[8][8];
-	
+
 	int score, bestScore;
 	bool firstLoad;
 	bool isMainMenu;
@@ -58,6 +58,7 @@ private:
 	void display();
 
 	// Main Game function:
+	void setSize(int s);
 	void newGame();
 	void update();
 	void render();
