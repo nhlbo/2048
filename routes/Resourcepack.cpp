@@ -21,8 +21,8 @@ std::pair<float, float> Resourcepack::getPair(json& dir) {
 	return std::pair<float, float>(*it, *(it + 1));
 }
 
-std::string Resourcepack::getFont(const char* key) {
-	return $FOLDER"fonts/" + m_data["fonts"][key].get<std::string>();
+std::string Resourcepack::getFont() {
+	return $FOLDER"fonts/" + m_data["fonts"].get<std::string>();
 }
 
 std::string Resourcepack::getSound(const char* key, int number) {
@@ -49,9 +49,8 @@ std::string Resourcepack::getNextSound(const char* key) {
 	return getSound(key, m);
 }
 
-std::string Resourcepack::getTexture(const char* key1, const char* key2) {
-	if (key2 == nullptr) return $FOLDER"textures/" + m_data["textures"][key1].get<std::string>();
-	return $FOLDER"textures/" + m_data["textures"][key1][key2].get<std::string>();
+std::string Resourcepack::getTexture(const char* key1) {
+	return $FOLDER"textures/" + m_data["textures"][key1].get<std::string>();
 }
 
 void Resourcepack::setButton(Button& button, const char* key) {
@@ -59,10 +58,3 @@ void Resourcepack::setButton(Button& button, const char* key) {
 	button.setPosition(getPair(m_data["textures"][key]["position"]));
 	button.setSize(getPair(m_data["textures"][key]["size"]));
 }
-
-void Resourcepack::setCell(const char* key) {
-	Cell::setSize(m_data["textures"]["block"][key], m_data["textures"]["block"][key]);
-	Cell::setTexture($FOLDER"textures/" + m_data["textures"]["block"]["link"].get<std::string>());
-	
-}
-

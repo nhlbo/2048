@@ -21,9 +21,6 @@
     <ClCompile Include="routes\csv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="routes\Game.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="routes\Cell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -33,12 +30,18 @@
     <ClCompile Include="routes\Resourcepack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="routes\2048_Classic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="routes\2048_Brick.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="routes\Picture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="controls\csv.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="controls\Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="controls\Cell.h">
@@ -48,6 +51,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="controls\Resourcepack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="controls\2048_Classic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="controls\2048_Brick.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="controls\Picture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
