@@ -11,10 +11,9 @@ void Game::Classic::init(RenderWindow* __window, Resourcepack* __res, Music* __m
 	firstLoad = true;
 	bestScore = 0;
 	loadBestScore();
-	N = 4;	// 4x4
 
-	for (int i = 0; i < N; ++i)
-		for (int j = 0; j < N; ++j) {
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j) {
 			cells[i][j].setPosition(20 + (150 + 10) * j, 20 + (150 + 10) * i);
 			// start position: (20, 20) px
 			// size of cells : 150x150 px
@@ -57,37 +56,36 @@ void Game::Classic::start() {
 				window->close();
 				return;
 			}
-			else {
-				bool moved = 0;
+			bool moved = 0;
+			if (isGameOver) {
+				render();
+			}
+			if (e.type == Event::KeyPressed) {
+				if (e.key.code == Keyboard::Left || e.key.code == Keyboard::A) moved |= moveLeft();
+				if (e.key.code == Keyboard::Right || e.key.code == Keyboard::D) moved |= moveRight();
+				if (e.key.code == Keyboard::Up || e.key.code == Keyboard::W) moved |= moveUp();
+				if (e.key.code == Keyboard::Down || e.key.code == Keyboard::S) moved |= moveDown();
+			}
+			if (e.type == Event::MouseButtonReleased) {
+				if (newGameButton.clicked(window)) {
+					newGame();
+				}
 				if (isGameOver) {
-					render();
-				}
-				if (e.type == Event::KeyPressed) {
-					if (e.key.code == Keyboard::Left || e.key.code == Keyboard::A) moved |= moveLeft();
-					if (e.key.code == Keyboard::Right || e.key.code == Keyboard::D) moved |= moveRight();
-					if (e.key.code == Keyboard::Up || e.key.code == Keyboard::W) moved |= moveUp();
-					if (e.key.code == Keyboard::Down || e.key.code == Keyboard::S) moved |= moveDown();
-				}
-				else if (e.type == Event::MouseButtonReleased) {
-					if (newGameButton.clicked(window)) {
+					if (tryAgainButton.clicked(window)) {
 						newGame();
 					}
-					if (isGameOver) {
-						if (tryAgainButton.clicked(window)) {
-							newGame();
-						}
-						else if (backToMenu.clicked(window)) {
-							saveTable();
-							firstLoad = true;
-							return;	// back Game::Mainmenu
-						}
+					else if (backToMenu.clicked(window)) {
+						saveTable();
+						firstLoad = true;
+						return;	// back Game::Mainmenu
 					}
 				}
-				if (moved) {
-					newCells();
-					if (isLose());
-				}
 			}
+			if (moved) {
+				newCells();
+				if (isLose());
+			}
+
 		}
 	}
 }
@@ -107,8 +105,8 @@ void Game::Classic::draw(Text& text) { window->draw(text); }
 void Game::Classic::draw(Cell& cell) { cell.draw(window); }
 
 void Game::Classic::draw(Cell cell[4][4], int remove_i, int remove_j) {
-	for (int i = 0; i < N; i++)
-		for (int j = 0; j < N; j++) {
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4; j++) {
 			if (i == remove_i && j == remove_j) continue;
 			draw(cell[i][j]);
 		}
@@ -125,8 +123,8 @@ void Game::Classic::newGame() {
 	else {
 		isGameOver = false;
 		score = 0;
-		for (int i = 0; i < N; i++)
-			for (int j = 0; j < N; j++) cells[i][j] = 0;
+		for (int i = 0; i < 4; i++)
+			for (int j = 0; j < 4; j++) cells[i][j] = 0;
 		newCells();
 		newCells();
 	}
@@ -256,8 +254,8 @@ void Game::Classic::newcell_animation(int u, int v) {
 
 void Game::Classic::newCells() {
 	int emptyCells = 0;
-	for (int i = 0; i < N; ++i)
-		for (int j = 0; j < N; ++j)
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
 			emptyCells += (cells[i][j] == 0);
 
 	if (emptyCells == 0) {
@@ -266,8 +264,8 @@ void Game::Classic::newCells() {
 	}
 	int randCells = rand() % emptyCells;
 
-	for (int i = 0; i < N; ++i)
-		for (int j = 0; j < N; ++j)
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
 			if (cells[i][j] == 0 && --emptyCells == randCells) {
 				cells[i][j] = 1 << (rand() % 2 + 1);
 				newcell_animation(i, j);
@@ -278,8 +276,8 @@ void Game::Classic::newCells() {
 bool Game::Classic::moveLeft() {
 	//cerr << "Press Left" << endl;
 	bool moved = 0;
-	for (int j = 1; j < N; ++j)
-		for (int i = 0; i < N; ++i)
+	for (int j = 1; j < 4; ++j)
+		for (int i = 0; i < 4; ++i)
 			if (cells[i][j] != 0) {
 				for (int k = j - 1; k >= 0; --k) {
 					if (cells[i][k] != cells[i][j] && cells[i][k] != 0) {
@@ -310,10 +308,10 @@ bool Game::Classic::moveLeft() {
 bool Game::Classic::moveRight() {
 	//cerr << "Press Right" << endl;
 	bool moved = 0;
-	for (int j = N - 2; j >= 0; --j)
-		for (int i = 0; i < N; ++i)
+	for (int j = 4 - 2; j >= 0; --j)
+		for (int i = 0; i < 4; ++i)
 			if (cells[i][j] != 0) {
-				for (int k = j + 1; k < N; ++k) {
+				for (int k = j + 1; k < 4; ++k) {
 					if (cells[i][k] != cells[i][j] && cells[i][k] != 0) {
 						cells[i][k - 1] = cells[i][j];
 						if (k - 1 != j) {
@@ -326,7 +324,7 @@ bool Game::Classic::moveRight() {
 						score += cells[i][j].getVal();
 						moving_animation(i, k, i, j);
 					}
-					else if (k == N - 1 && cells[i][k] == 0) {
+					else if (k == 4 - 1 && cells[i][k] == 0) {
 						cells[i][k] = cells[i][j];
 						moving_animation(i, k, i, j);
 					}
@@ -342,8 +340,8 @@ bool Game::Classic::moveRight() {
 bool Game::Classic::moveUp() {
 	//cerr << "Press Up" << endl;
 	bool moved = 0;
-	for (int i = 1; i < N; ++i)
-		for (int j = 0; j < N; ++j)
+	for (int i = 1; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
 			if (cells[i][j] != 0) {
 				for (int k = i - 1; k >= 0; --k) {
 					if (cells[k][j] != cells[i][j] && cells[k][j] != 0) {
@@ -374,10 +372,10 @@ bool Game::Classic::moveUp() {
 bool Game::Classic::moveDown() {
 	//cerr << "Press Down" << endl;
 	bool moved = 0;
-	for (int i = N - 2; i >= 0; --i)
-		for (int j = 0; j < N; ++j)
+	for (int i = 4 - 2; i >= 0; --i)
+		for (int j = 0; j < 4; ++j)
 			if (cells[i][j] != 0) {
-				for (int k = i + 1; k < N; ++k) {
+				for (int k = i + 1; k < 4; ++k) {
 					if (cells[k][j] != cells[i][j] && cells[k][j] != 0) {
 						cells[k - 1][j] = cells[i][j];
 						if (k - 1 != i) {
@@ -390,7 +388,7 @@ bool Game::Classic::moveDown() {
 						score += cells[i][j].getVal();
 						moving_animation(k, j, i, j);
 					}
-					else if (k == N - 1 && cells[k][j] == 0) {
+					else if (k == 4 - 1 && cells[k][j] == 0) {
 						cells[k][j] = cells[i][j];
 						moving_animation(k, j, i, j);
 					}
@@ -406,19 +404,19 @@ bool Game::Classic::moveDown() {
 bool Game::Classic::isLose() {
 	int check = -1;
 
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
 			if (cells[i][j] == 0)
 				return false;
 		}
 	}
 
-	for (int i = 0; i < N; i++)
-		for (int j = 0; j < N - 1; j++)
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4 - 1; j++)
 			if (cells[i][j] == cells[i][j + 1])
 				check++;
-	for (int j = 0; j < N; j++)
-		for (int i = 0; i < N - 1; i++)
+	for (int j = 0; j < 4; j++)
+		for (int i = 0; i < 4 - 1; i++)
 			if (cells[i][j] == cells[i + 1][j])
 				check++;
 	return check < 0 ? isGameOver = true, true : false;
@@ -444,9 +442,9 @@ void Game::Classic::loadBestScore() {
 void Game::Classic::saveTable() {
 	fstream fTemp;
 	fTemp.open("data/temp.txt", ios::out);
-	fTemp << N << " " << N << endl;
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
+	fTemp << 4 << " " << 4 << endl;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
 			fTemp << cells[i][j].getVal() << " ";
 		}
 		fTemp << endl;
@@ -462,7 +460,7 @@ void Game::Classic::loadTable() {
 	if (!f.is_open()) return;
 	int zx, zy;
 	f >> zx >> zy;
-	if (zx == N && zy == N)
+	if (zx == 4 && zy == 4)
 		for (int i = 0; i < zx; i++)
 			for (int j = 0; j < zy; j++) {
 				int x;
