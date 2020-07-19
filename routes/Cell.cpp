@@ -71,6 +71,10 @@ void Cell::setPosition(float x, float y) {
 	m_shape.setPosition(sf::Vector2f(x, y));
 }
 
+void Cell::setPosition(sf::Vector2f pos) {
+	m_shape.setPosition(pos);
+}
+
 void Cell::setOutlineThickness(float thickness) {
 	m_shape.setOutlineThickness(thickness);
 }
@@ -96,3 +100,4 @@ void Cell::operator=(const Cell& v) { update(v.m_data); }
 void Cell::operator+=(int val) { update(m_data + val); }
 
 void Cell::operator+=(const Cell& v) { update(m_data + v.m_data); }
+

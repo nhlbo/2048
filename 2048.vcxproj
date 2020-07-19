@@ -143,17 +143,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="routes\2048_Brick.cpp" />
+    <ClCompile Include="routes\2048_Classic.cpp" />
     <ClCompile Include="routes\Cell.cpp" />
     <ClCompile Include="routes\csv.cpp" />
-    <ClCompile Include="routes\Game.cpp" />
     <ClCompile Include="routes\Button.cpp" />
+    <ClCompile Include="routes\Picture.cpp" />
     <ClCompile Include="routes\Resourcepack.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="controls\2048_Brick.h" />
+    <ClInclude Include="controls\2048_Classic.h" />
     <ClInclude Include="controls\Cell.h" />
     <ClInclude Include="controls\csv.h" />
-    <ClInclude Include="controls\Game.h" />
     <ClInclude Include="controls\Button.h" />
+    <ClInclude Include="controls\Picture.h" />
     <ClInclude Include="controls\Resourcepack.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

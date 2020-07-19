@@ -1,0 +1,73 @@
+{
+    "fonts": {
+        "bestscore": "MinecraftTen-VGORe.ttf",
+        "score": "MinecraftTen-VGORe.ttf"
+    },
+    "name": "minecraft",
+    "sounds": {
+        "music": [
+            "Key.wav",
+            "Subwoofer-Lullaby.wav",
+            "Living-Mice.wav",
+            "Haggstrom.wav",
+            "Minecraft.wav",
+            "Oxygene.wav",
+            "Mice-on-Venus.wav",
+            "Dry_Hands.wav",
+            "Wet-Hands.wav",
+            "Clark.wav",
+            "Sweden.wav",
+            "Danny.wav",
+            "Moog-City.wav",
+            "Beginning.wav"
+        ]
+    },
+    "textures": {
+        "background": "background.png",
+        "bestscoreboard": {
+            "link": "bestscore.png",
+            "position": [
+                750,
+                200
+            ],
+            "size": [
+                110,
+                50
+            ]
+        },
+        "block": {
+            "4x4": 150,
+            "6x6": 96,
+            "8x8": 70,
+            "link": "block.png"
+        },
+        "frame": {
+            "4x4": "frame4x4.png",
+            "6x6": "frame6x6.png",
+            "8x8": "frame8x8.png"
+        },
+        "mainmenu": "mainmenu.png",
+        "newgamebutton": {
+            "link": "newgame.png",
+            "position": [
+                750,
+                70
+            ],
+            "size": [
+                110,
+                32
+            ]
+        },
+        "scoreboard": {
+            "link": "score.png",
+            "position": [
+                750,
+                130
+            ],
+            "size": [
+                110,
+                50
+            ]
+        }
+    }
+}

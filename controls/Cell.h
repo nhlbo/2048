@@ -33,6 +33,7 @@ public:
 	static void setTexture(const std::string _texture);
 	static void setTexture(const char* _texture);
 	void setPosition(float x, float y);
+	void setPosition(sf::Vector2f pos);
 	void setOutlineThickness(float thickness);
 	void draw(sf::RenderWindow* window);
 
@@ -44,6 +45,6 @@ public:
 	void operator=(int val);			
 	void operator=(const Cell& v);		
 	void operator+=(int val);			
-	void operator+=(const Cell& v);		
+	void operator+=(const Cell& v);	
 };
 #endif
