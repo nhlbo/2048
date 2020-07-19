@@ -27,8 +27,6 @@ private:
 	sf::RectangleShape loseBackground;
 	Button newGameButton, scoreBoard, bestScoreBoard, tryAgainButton, backToMenu;
 	sf::Text scoreTitle, bestScoreTitle, loseTitle;
-
-	int N;
 	Cell cells[4][4];
 
 	int score, bestScore;
@@ -54,8 +52,8 @@ private:
 	void renderText(sf::Text& text, std::string str, sf::Color color, int fontSize, int x, int y);
 
 	// Cells function: move, new, animation
-	void moving_animation(int i, int j, int x, int y);
-	void newcell_animation(int i, int j);
+	void moving_animation(int i, int j, int u, int v);
+	void newcell_animation(int u, int v);
 	void newCells();
 	bool moveLeft();
 	bool moveRight();

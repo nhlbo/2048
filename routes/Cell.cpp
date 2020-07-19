@@ -27,11 +27,9 @@ int Cell::getTextSize(int point) {
 
 void Cell::update(int val) {
 	if (val > -1) m_data = val;
-
 	m_shape.setSize(m_size);
-	m_shape.setTexture(&m_skin);
-	m_shape.setOutlineColor(sf::Color::Transparent);
 	if (m_data == 0) {
+		m_shape.setTexture(&m_skin);
 		m_shape.setTextureRect(sf::IntRect(0, 0, TEXTURE_SIZE, TEXTURE_SIZE));
 	}
 	else {

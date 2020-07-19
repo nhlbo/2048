@@ -4,6 +4,7 @@
 using namespace sf;
 
 int main() {
+	srand(time(NULL));
 	RenderWindow window(VideoMode(950, 720), "2048", Style::Titlebar | Style::Close);
 	Resourcepack res;
 	Music music;
@@ -38,8 +39,6 @@ int main() {
 			resouButton.draw(&window);
 			window.display();
 			isMainmenu = 1;
-			classic.loadResourcepack();
-			//brick.loadResourcepack();
 		}
 
 		Event e;
@@ -51,10 +50,13 @@ int main() {
 			else if (e.type == Event::MouseButtonReleased) {
 				if (classicButton.clicked(&window)) {
 					// play 2048::classic
+					classic.loadResourcepack();
 					classic.start();
 				}
 				else if (brickButton.clicked(&window)) {
 					// play 2048::brick
+					brick.loadResourcepack();
+					brick.start();
 				}
 				else if (resouButton.clicked(&window)) {
 					// change resourcepack
