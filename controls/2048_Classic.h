@@ -3,30 +3,34 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <fstream>
+#include "Animation.h"
 #include "Resourcepack.h"
 #include "Button.h"
 #include "Cell.h"
 #include "Picture.h"
 
+using namespace sf;
+using namespace std;
+
 namespace Game { class Classic; }
 
 class Game::Classic {
 public:
-	void init(sf::RenderWindow* __window, Resourcepack* __res, sf::Music* __music);
+	void init(RenderWindow* __window, Resourcepack* __res, Music* __music);
 	bool loadResourcepack();
 	void start();
 
 private:
-	// shared attribute 
-	sf::RenderWindow* window;
+	// Shared attribute 
+	RenderWindow* window;
 	Resourcepack* res;
-	sf::Music* music;
+	Music* music;
 
-	sf::Font font;
+	Font font;
 	Picture background, frame;
-	sf::RectangleShape loseBackground;
+	RectangleShape loseBackground;
 	Button newGameButton, scoreBoard, bestScoreBoard, tryAgainButton, backToMenu;
-	sf::Text scoreTitle, bestScoreTitle, loseTitle;
+	Text scoreTitle, bestScoreTitle, loseTitle;
 	Cell cells[4][4];
 
 	int score, bestScore;
@@ -35,12 +39,12 @@ private:
 	bool isGameOver;
 
 	// RenderWindow function: clear, draw, display
-	void clear(sf::Color color = sf::Color(0, 0, 0, 255));
-	void draw(sf::RectangleShape& shape);
-	void draw(sf::Sprite& shape);
+	void clear(Color color = Color(0, 0, 0, 255));
+	void draw(RectangleShape& shape);
+	void draw(Sprite& shape);
 	void draw(Picture& picture);
 	void draw(Button& button);
-	void draw(sf::Text& text);
+	void draw(Text& text);
 	void draw(Cell& cell);
 	void draw(Cell cell[4][4], int remove_i = -1, int remove_j = -1);
 	void display();
@@ -49,12 +53,12 @@ private:
 	void newGame();
 	void update();
 	void render();
-	void renderText(sf::Text& text, std::string str, sf::Color color, int fontSize, int x, int y);
+	void renderText(Text& text, std::string str, Color color, int fontSize, int x, int y);
 
 	// Cells function: move, new, animation
-	void moving_animation(int i, int j, int u, int v);
-	void newcell_animation(int u, int v);
-	void newCells();
+	void makeAnimation(int i, int j, int u, int v);
+	void runAnimation(void (Animation::*animate)(RenderWindow*, Picture&));
+	void newCells(int time = 1);
 	bool moveLeft();
 	bool moveRight();
 	bool moveUp();

@@ -1,8 +1,5 @@
 #include "..\controls\2048_Brick.h"
 
-using namespace sf;
-using namespace std;
-
 void Game::Brick::init(RenderWindow* __window, Resourcepack* __res, Music* __music) {
 	window = __window;
 	res = __res;

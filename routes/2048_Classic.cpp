@@ -1,8 +1,5 @@
 #include "..\controls\2048_Classic.h"
 
-using namespace sf;
-using namespace std;
-
 void Game::Classic::init(RenderWindow* __window, Resourcepack* __res, Music* __music) {
 	window = __window;
 	res = __res;
@@ -82,6 +79,7 @@ void Game::Classic::start() {
 				}
 			}
 			if (moved) {
+				runAnimation(&Animation::move);
 				newCells();
 				if (isLose());
 			}
@@ -124,9 +122,11 @@ void Game::Classic::newGame() {
 		isGameOver = false;
 		score = 0;
 		for (int i = 0; i < 4; i++)
-			for (int j = 0; j < 4; j++) cells[i][j] = 0;
-		newCells();
-		newCells();
+			for (int j = 0; j < 4; j++) {
+				cells[i][j] = 0; 
+				copy[i][j] = cells[i][j].getShape();
+			}
+		newCells(2);
 	}
 	update();
 	render();
@@ -173,104 +173,59 @@ void Game::Classic::renderText(Text& text, string str, Color color, int fontSize
 	text.setPosition(x, y);
 }
 
-void Game::Classic::moving_animation(int i, int j, int u, int v) {
-	cells[u][v] = 0;
-	update();
+void Game::Classic::makeAnimation(int i, int j, int u, int v) {
+	animation.push(cells[i][j].getShape(), cells[i][j].distance(cells[u][v]));
+	copy[i][j].setSize(Vector2f(0, 0));						// setSize = (0, 0) to disable this cell
+	cells[i][j] = 0;
+}
 
-	// optimize animation
-	Texture tex;
-	tex.create(950, 720);
-	clear();
+void Game::Classic::runAnimation(void(Animation::*animate)(RenderWindow*, Picture&)) {
+	// make window background for animation
+	clear(Color::White);
 	draw(background);
 	draw(newGameButton);
 	draw(scoreBoard);
 	draw(scoreTitle);
 	draw(bestScoreBoard);
 	draw(bestScoreTitle);
-	draw(cells);
-	tex.update(*window);
-	Sprite temp(tex);
-
-	int n_moves = 5;
-	RectangleShape cell = cells[i][j].getShape();
-	Vector2f posCell = cells[u][v].getShape().getPosition();
-	Vector2f posCOld = cell.getPosition();
-	Time delay = milliseconds(0.08);
-
-	float dx = posCOld.x - posCell.x;
-	float dy = posCOld.y - posCell.y;
-	dx /= n_moves; dy /= n_moves;
-
-	for (int move = 0; move < n_moves; ++move) {
-		posCell.x += dx;
-		posCell.y += dy;
-		cell.setPosition(posCell);
-
-		sleep(delay);
-		clear();
-		draw(temp);
-		draw(cell);
-		draw(frame);
-		display();
-	}
-}
-
-void Game::Classic::newcell_animation(int u, int v) {
-	// optimize animation
-	Texture tex;
-	tex.create(950, 720);
-	clear();
-	draw(background);
-	draw(newGameButton);
-	draw(scoreBoard);
-	draw(scoreTitle);
-	draw(bestScoreBoard);
-	draw(bestScoreTitle);
-	draw(cells, u, v);
-	tex.update(*window);
-	Sprite temp(tex);
-
-	RectangleShape cell = cells[u][v].getShape();
-	Vector2f posCell = cell.getPosition();
-	Vector2f size = cell.getSize();
-	Time delay = milliseconds(18);
-
-	posCell.x += 25;
-	posCell.y += 25;
-
-	for (int i = 50; i >= 0; i -= 10) {
-		cell.setSize(Vector2f(size.x - i, size.y - i));
-		cell.setPosition(posCell);
-		posCell.x -= 5;
-		posCell.y -= 5;
-
-		sleep(delay);
-		draw(temp);
-		draw(cell);
-		draw(frame);
-		display();
-	}
-}
-
-void Game::Classic::newCells() {
-	int emptyCells = 0;
 	for (int i = 0; i < 4; ++i)
-		for (int j = 0; j < 4; ++j)
-			emptyCells += (cells[i][j] == 0);
-
-	if (emptyCells == 0) {
-
-		return;
-	}
-	int randCells = rand() % emptyCells;
-
-	for (int i = 0; i < 4; ++i)
-		for (int j = 0; j < 4; ++j)
-			if (cells[i][j] == 0 && --emptyCells == randCells) {
-				cells[i][j] = 1 << (rand() % 2 + 1);
-				newcell_animation(i, j);
-				return;
+		for (int j = 0; j < 4; ++j) {
+			if (copy[i][j].getSize() != Vector2f(0, 0)) {	// setSize = (0, 0) to disable this cell
+				draw(copy[i][j]);
 			}
+		}
+
+	// run animation
+	(animation.*animate)(window, frame);
+
+	// reset bool checker
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j) {
+			copy[i][j] = cells[i][j].getShape();
+		}
+}
+
+void Game::Classic::newCells(int time) {
+	while (1) {
+		int emptyCells = 0;
+		for (int i = 0; i < 4; ++i)
+			for (int j = 0; j < 4; ++j)
+				emptyCells += (cells[i][j] == 0);
+		if (emptyCells == 0) break;
+
+		int randCells = rand() % emptyCells;
+		for (int i = 0; i < 4; ++i)
+			for (int j = 0; j < 4; ++j)
+				if (cells[i][j] == 0 && --emptyCells == randCells) {
+					cells[i][j] = 1 << (rand() % 2 + 1);
+					animation.push(cells[i][j].getShape(), Vector2f(0, 0));
+					goto SUCCESS;
+				}
+		
+	SUCCESS:	// break 2 for
+		if (--time == 0) break;
+	}
+	runAnimation(&Animation::appear);
 }
 
 bool Game::Classic::moveLeft() {
@@ -283,22 +238,22 @@ bool Game::Classic::moveLeft() {
 					if (cells[i][k] != cells[i][j] && cells[i][k] != 0) {
 						cells[i][k + 1] = cells[i][j];
 						if (k + 1 != j) {
-							moving_animation(i, k + 1, i, j);
+							makeAnimation(i, j, i, k + 1);
 						}
 						else break;
 					}
 					else if (cells[i][k] == cells[i][j]) {
 						cells[i][k] += cells[i][j];
 						score += cells[i][j].getVal();
-						moving_animation(i, k, i, j);
+						makeAnimation(i, j, i, k);
 					}
 					else if (k == 0 && cells[i][k] == 0) {
 						cells[i][k] = cells[i][j];
-						moving_animation(i, k, i, j);
+						makeAnimation(i, j, i, k);
 					}
 					else continue;
 
-					moved |= (cells[i][j] == 0);
+					moved = 1;
 					break;
 				}
 			}
@@ -315,22 +270,22 @@ bool Game::Classic::moveRight() {
 					if (cells[i][k] != cells[i][j] && cells[i][k] != 0) {
 						cells[i][k - 1] = cells[i][j];
 						if (k - 1 != j) {
-							moving_animation(i, k - 1, i, j);
+							makeAnimation(i, j, i, k - 1);
 						}
 						else  break;
 					}
 					else if (cells[i][k] == cells[i][j]) {
 						cells[i][k] += cells[i][j];
 						score += cells[i][j].getVal();
-						moving_animation(i, k, i, j);
+						makeAnimation(i, j, i, k);
 					}
 					else if (k == 4 - 1 && cells[i][k] == 0) {
 						cells[i][k] = cells[i][j];
-						moving_animation(i, k, i, j);
+						makeAnimation(i, j, i, k);
 					}
 					else continue;
 
-					moved |= (cells[i][j] == 0);
+					moved = 1;
 					break;
 				}
 			}
@@ -347,22 +302,22 @@ bool Game::Classic::moveUp() {
 					if (cells[k][j] != cells[i][j] && cells[k][j] != 0) {
 						cells[k + 1][j] = cells[i][j];
 						if (k + 1 != i) {
-							moving_animation(k + 1, j, i, j);
+							makeAnimation(i, j, k + 1, j);
 						}
 						else  break;
 					}
 					else if (cells[k][j] == cells[i][j]) {
 						cells[k][j] += cells[i][j];
 						score += cells[i][j].getVal();
-						moving_animation(k, j, i, j);
+						makeAnimation(i, j, k, j);
 					}
 					else if (k == 0 && cells[k][j] == 0) {
 						cells[k][j] = cells[i][j];
-						moving_animation(k, j, i, j);
+						makeAnimation(i, j, k, j);
 					}
 					else continue;
 
-					moved |= (cells[i][j] == 0);
+					moved = 1;
 					break;
 				}
 			}
@@ -379,22 +334,22 @@ bool Game::Classic::moveDown() {
 					if (cells[k][j] != cells[i][j] && cells[k][j] != 0) {
 						cells[k - 1][j] = cells[i][j];
 						if (k - 1 != i) {
-							moving_animation(k - 1, j, i, j);
+							makeAnimation(i, j, k - 1, j);
 						}
 						else  break;
 					}
 					else if (cells[k][j] == cells[i][j]) {
 						cells[k][j] += cells[i][j];
 						score += cells[i][j].getVal();
-						moving_animation(k, j, i, j);
+						makeAnimation(i, j, k, j);
 					}
 					else if (k == 4 - 1 && cells[k][j] == 0) {
 						cells[k][j] = cells[i][j];
-						moving_animation(k, j, i, j);
+						makeAnimation(i, j, k, j);
 					}
 					else continue;
 
-					moved |= (cells[i][j] == 0);
+					moved = 1;
 					break;
 				}
 			}

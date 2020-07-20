@@ -26,6 +26,7 @@ public:
 	Cell();
 
 	// member function
+	sf::Vector2f distance(Cell& v);
 	sf::RectangleShape getShape();
 	sf::Vector2f getPosition();
 	int getVal();
