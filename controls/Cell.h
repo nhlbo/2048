@@ -3,13 +3,10 @@
 #include <SFML/Graphics.hpp>
 
 #define TEXTURE_SIZE m_skin.getSize().y
-#define WIDTH m_size.x
-#define HEIGHT m_size.y
 
 class Cell {
 	// <- this is private (by default)
 	// static attribute
-	static sf::Vector2f m_size;
 	static sf::Texture m_skin;
 
 	// member attribute
@@ -26,13 +23,13 @@ public:
 	Cell();
 
 	// member function
+	static void setTexture(const std::string _texture);
+	static void setTexture(const char* _texture);
 	sf::Vector2f distance(Cell& v);
 	sf::RectangleShape getShape();
 	sf::Vector2f getPosition();
 	int getVal();
-	static void setSize(float width, float height);
-	static void setTexture(const std::string _texture);
-	static void setTexture(const char* _texture);
+	void setSize(float width, float height);
 	void setPosition(float x, float y);
 	void setPosition(sf::Vector2f pos);
 	void setOutlineThickness(float thickness);

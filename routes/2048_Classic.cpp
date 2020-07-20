@@ -11,6 +11,7 @@ void Game::Classic::init(RenderWindow* __window, Resourcepack* __res, Music* __m
 
 	for (int i = 0; i < 4; ++i)
 		for (int j = 0; j < 4; ++j) {
+			cells[i][j].setSize(150, 150);
 			cells[i][j].setPosition(20 + (150 + 10) * j, 20 + (150 + 10) * i);
 			// start position: (20, 20) px
 			// size of cells : 150x150 px
@@ -27,7 +28,6 @@ bool Game::Classic::loadResourcepack() {
 	res->setButton(tryAgainButton, "tryagain");
 	res->setButton(backToMenu, "backtomenu");
 
-	Cell::setSize(150, 150);
 	Cell::setTexture(res->getTexture("block"));
 	background.setTexture(res->getTexture("background"));
 	frame.setTexture(res->getTexture("frame"));

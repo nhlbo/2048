@@ -1,7 +1,6 @@
 #include "..\controls\Cell.h"
 
 // identify static attributes (default)
-sf::Vector2f Cell::m_size(sf::Vector2f(100, 100));
 sf::Texture Cell::m_skin(creatTexture("resourcepacks/classical/textures/block.png"));
 
 sf::Texture Cell::creatTexture(const char* _texture) {
@@ -27,7 +26,6 @@ int Cell::getTextSize(int point) {
 
 void Cell::update(int val) {
 	if (val > -1) m_data = val;
-	m_shape.setSize(m_size);
 	if (m_data == 0) {
 		m_shape.setTextureRect(sf::IntRect(0, 0, TEXTURE_SIZE, TEXTURE_SIZE));
 	}
@@ -39,6 +37,14 @@ void Cell::update(int val) {
 Cell::Cell() {
 	m_shape.setTexture(&m_skin);
 	update(0);
+}
+
+void Cell::setTexture(const std::string _texture) {
+	Cell::m_skin.loadFromFile(_texture);
+}
+
+void Cell::setTexture(const char* _texture) {
+	Cell::m_skin.loadFromFile(_texture);
 }
 
 sf::Vector2f Cell::distance(Cell& v) {
@@ -58,15 +64,7 @@ int Cell::getVal() {
 }
 
 void Cell::setSize(float width, float height) {
-	Cell::m_size = sf::Vector2f(width, height);
-}
-
-void Cell::setTexture(const std::string _texture) {
-	Cell::m_skin.loadFromFile(_texture);
-}
-
-void Cell::setTexture(const char* _texture) {
-	Cell::m_skin.loadFromFile(_texture);
+	m_shape.setSize(sf::Vector2f(width, height));
 }
 
 void Cell::setPosition(float x, float y) {

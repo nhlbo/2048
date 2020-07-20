@@ -11,6 +11,7 @@ void Game::Brick::init(RenderWindow* __window, Resourcepack* __res, Music* __mus
 
 	for (int i = 0; i < 7; ++i)
 		for (int j = 0; j < 5; ++j) {
+			cells[i][j].setSize(90, 90);
 			cells[i][j].setPosition(110 + 90 * j, 20 + 90 * i);
 			// start position: (110, 20) px
 			// size of cells : 90x90 px
@@ -27,7 +28,6 @@ bool Game::Brick::loadResourcepack() {
 	res->setButton(tryAgainButton, "tryagain");
 	res->setButton(backToMenu, "backtomenu");
 
-	Cell::setSize(90, 90);
 	Cell::setTexture(res->getTexture("block"));
 	background.setTexture(res->getTexture("background"));
 	frame.setTexture(res->getTexture("frame"));
