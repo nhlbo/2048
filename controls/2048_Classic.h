@@ -26,6 +26,10 @@ private:
 	Resourcepack* res;
 	Music* music;
 
+	// Animation attribute
+	Animation animation;
+	RectangleShape copy[4][4];		// old-version of cells
+
 	Font font;
 	Picture background, frame;
 	RectangleShape loseBackground;
