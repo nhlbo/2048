@@ -145,6 +145,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="routes\2048_Brick.cpp" />
     <ClCompile Include="routes\2048_Classic.cpp" />
+    <ClCompile Include="routes\Animation.cpp" />
     <ClCompile Include="routes\Cell.cpp" />
     <ClCompile Include="routes\csv.cpp" />
     <ClCompile Include="routes\Button.cpp" />
@@ -154,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="controls\2048_Brick.h" />
     <ClInclude Include="controls\2048_Classic.h" />
+    <ClInclude Include="controls\Animation.h" />
     <ClInclude Include="controls\Cell.h" />
     <ClInclude Include="controls\csv.h" />
     <ClInclude Include="controls\Button.h" />

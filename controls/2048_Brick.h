@@ -8,26 +8,29 @@
 #include "Cell.h"
 #include "Picture.h"
 
+using namespace sf;
+using namespace std;
+
 namespace Game { class Brick; }
 
 class Game::Brick {
 public:
-	void init(sf::RenderWindow* __window, Resourcepack* __res, sf::Music* __music);
+	void init(RenderWindow* __window, Resourcepack* __res, Music* __music);
 	bool loadResourcepack();
 	void start();
 
 private:
 	// shared attribute 
-	sf::RenderWindow* window;
+	RenderWindow* window;
 	Resourcepack* res;
-	sf::Music* music;
+	Music* music;
 
-	sf::Font font;
+	Font font;
 	Picture background, frame;
-	sf::RectangleShape loseBackground;
+	RectangleShape loseBackground;
 	Button newGameButton, scoreBoard, bestScoreBoard, tryAgainButton, backToMenu;
-	sf::Text scoreTitle, bestScoreTitle, loseTitle;
-	std::pair<int,int> cur;
+	Text scoreTitle, bestScoreTitle, loseTitle;
+	pair<int,int> cur;
 	Cell cells[7][5], next;
 
 	int score, bestScore;
@@ -36,12 +39,12 @@ private:
 	bool isGameOver;
 
 	// RenderWindow function: clear, draw, display
-	void clear(sf::Color color = sf::Color(0, 0, 0, 255));
-	void draw(sf::RectangleShape& shape);
-	void draw(sf::Sprite& shape);
+	void clear(Color color = Color(0, 0, 0, 255));
+	void draw(RectangleShape& shape);
+	void draw(Sprite& shape);
 	void draw(Picture& picture);
 	void draw(Button& button);
-	void draw(sf::Text& text);
+	void draw(Text& text);
 	void draw(Cell& cell);
 	void draw(Cell cell[7][5], int remove_i = -1, int remove_j = -1);
 	void display();
@@ -50,7 +53,7 @@ private:
 	void newGame();
 	void update();
 	void render();
-	void renderText(sf::Text& text, std::string str, sf::Color color, int fontSize, int x, int y);
+	void renderText(Text& text, std::string str, Color color, int fontSize, int x, int y);
 
 	// Cells function: move, new, animation
 	void moving_animation(int i, int j, int u, int v);

@@ -41,6 +41,10 @@ Cell::Cell() {
 	update(0);
 }
 
+sf::Vector2f Cell::distance(Cell& v) {
+	return v.getPosition() - getPosition();
+}
+
 sf::RectangleShape Cell::getShape() {
 	return m_shape;
 }
