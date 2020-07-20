@@ -80,6 +80,7 @@ void Game::Classic::start() {
 			}
 			if (moved) {
 				runAnimation(&Animation::move);
+				update();
 				newCells();
 				if (isLose());
 			}
