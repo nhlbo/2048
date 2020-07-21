@@ -16,6 +16,7 @@ public:
 	sf::Vector2f getPosition();
 	void setTexture(const std::string& _texture);
 	void setTexture(const char* _texture);
+	void setColor(sf::Color color);
 	template<class T> void setPosition(std::pair<T, T> pos) {
 		m_shape.setPosition(sf::Vector2f(pos.first, pos.second));
 	}

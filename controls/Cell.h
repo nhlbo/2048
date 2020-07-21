@@ -44,5 +44,6 @@ public:
 	void operator=(const Cell& v);		
 	void operator+=(int val);			
 	void operator+=(const Cell& v);	
+	void operator*=(int val);
 };
 #endif

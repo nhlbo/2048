@@ -31,6 +31,7 @@ bool Game::Brick::loadResourcepack() {
 	Cell::setTexture(res->getTexture("block"));
 	background.setTexture(res->getTexture("background"));
 	frame.setTexture(res->getTexture("frame"));
+	frame.setColor(Color(0, 0, 0, 0));
 
 	loseBackground.setFillColor(Color(238, 228, 218, 150));
 	loseBackground.setPosition(Vector2f(10, 10));
@@ -78,7 +79,7 @@ void Game::Brick::start() {
 				}
 			}
 		}
-		if (Keyboard::isKeyPressed(Keyboard::Down) || Keyboard::isKeyPressed(Keyboard::S)) delay = seconds(0.05);
+		if (Keyboard::isKeyPressed(Keyboard::Down) || Keyboard::isKeyPressed(Keyboard::S)) delay = milliseconds(5);
 
 		if (clock.getElapsedTime() > delay) {
 			if (isGameOver) {
@@ -89,6 +90,9 @@ void Game::Brick::start() {
 			}
 			else if (!moveCells(2)) {
 				merge(cur.first, cur.second);
+				runAnimation(&Animation::move);
+				fall();
+				cur.first = -1;
 			}
 			
 			clock.restart();
@@ -124,7 +128,7 @@ void Game::Brick::display() { window->display(); }
 void Game::Brick::newGame() {
 	if (0 && firstLoad) {
 		firstLoad = false;
-		cur = { -1, 2 };
+		cur;
 		//loadTable();
 		//isLose();
 	}
@@ -133,8 +137,10 @@ void Game::Brick::newGame() {
 		score = 0;
 		cur = { -1, 2 };
 		for (int i = 0; i < 7; i++)
-			for (int j = 0; j < 5; j++) 
+			for (int j = 0; j < 5; j++) {
 				cells[i][j] = 0;
+				copy[i][j] = cells[i][j].getShape();
+			}
 	}
 	update();
 	render();
@@ -181,90 +187,45 @@ void Game::Brick::renderText(Text& text, string str, Color color, int fontSize, 
 	text.setPosition(x, y);
 }
 
-void Game::Brick::moving_animation(int i, int j, int u, int v) {
-	cells[u][v] = 0;
-	update();
-
-	// optimize animation
-	Texture tex;
-	tex.create(950, 720);
-	clear();
-	draw(background);
-	draw(newGameButton);
-	draw(scoreBoard);
-	draw(scoreTitle);
-	draw(bestScoreBoard);
-	draw(bestScoreTitle);
-	draw(cells);
-	tex.update(*window);
-	Sprite temp(tex);
-
-	int n_moves = 5;
-	RectangleShape cell = cells[i][j].getShape();
-	Vector2f posCell = cells[u][v].getShape().getPosition();
-	Vector2f posCOld = cell.getPosition();
-	Time delay = milliseconds(0.08);
-
-	float dx = posCOld.x - posCell.x;
-	float dy = posCOld.y - posCell.y;
-	dx /= n_moves; dy /= n_moves;
-
-	for (int move = 0; move < n_moves; ++move) {
-		posCell.x += dx;
-		posCell.y += dy;
-		cell.setPosition(posCell);
-
-		sleep(delay);
-		clear();
-		draw(temp);
-		draw(cell);
-		//draw(frame);
-		display();
-	}
+void Game::Brick::makeAnimation(int i, int j, int u, int v) {
+	animation.push(cells[i][j].getShape(), cells[i][j].distance(cells[u][v]));
+	copy[i][j].setSize(Vector2f(0, 0));						// setSize = (0, 0) to disable this cell
+	cells[i][j] = 0;
 }
 
-void Game::Brick::newcell_animation(int u, int v) {
-	// optimize animation
-	Texture tex;
-	tex.create(950, 720);
-	clear();
+void Game::Brick::runAnimation(void(Animation::* animate)(RenderWindow*, Picture&)) {
+	// make window background for animation
+	clear(Color::White);
 	draw(background);
 	draw(newGameButton);
 	draw(scoreBoard);
 	draw(scoreTitle);
 	draw(bestScoreBoard);
 	draw(bestScoreTitle);
-	draw(cells, u, v);
-	tex.update(*window);
-	Sprite temp(tex);
+	for (int i = 0; i < 7; ++i)
+		for (int j = 0; j < 5; ++j) {
+			if (copy[i][j].getSize() != Vector2f(0, 0)) {	// setSize = (0, 0) to disable this cell
+				draw(copy[i][j]);
+			}
+		}
 
-	RectangleShape cell = cells[u][v].getShape();
-	Vector2f posCell = cell.getPosition();
-	Vector2f size = cell.getSize();
-	Time delay = milliseconds(18);
+	// run animation
+	(animation.*animate)(window, frame);
 
-	posCell.x += 25;
-	posCell.y += 25;
-
-	for (int i = 50; i >= 0; i -= 10) {
-		cell.setSize(Vector2f(size.x - i, size.y - i));
-		cell.setPosition(posCell);
-		posCell.x -= 5;
-		posCell.y -= 5;
-
-		sleep(delay);
-		draw(temp);
-		draw(cell);
-		//draw(frame);
-		display();
-	}
+	// reset bool checker
+	for (int i = 0; i < 7; ++i)
+		for (int j = 0; j < 5; ++j) {
+			copy[i][j] = cells[i][j].getShape();
+		}
 }
 
 void Game::Brick::newCells() {
 	if (cells[0][2] != 0) return;	// start cell
 	cur = { 0, 2 };
 	cells[0][2] = 1 << (rand() % 6 + 1);
-	newcell_animation();
+	//newcell_animation();
+	animation.push(cells[0][2].getShape(), Vector2f(0, 0));
+	runAnimation(&Animation::appear);
 }
 
 bool Game::Brick::moveCells(int move) {
@@ -272,25 +233,72 @@ bool Game::Brick::moveCells(int move) {
 	if (move == 2) {
 		if (x >= 6 || cells[x + 1][y] != 0) return 0;
 		cells[x + 1][y] = cells[x][y];
-		moving_animation(x + 1, y, x, y);
+		//moving_animation(x + 1, y, x, y);
+		makeAnimation(x, y, x + 1, y);
 		cur.first++;
 	}
 	if (move == 0) {
 		if (y <= 0 || cells[x][y - 1] != 0) return 0;
 		cells[x][y - 1] = cells[x][y];
-		moving_animation(x, y - 1, x, y);
+		//moving_animation(x, y - 1, x, y);
+		makeAnimation(x, y, x, y - 1);
 		cur.second--;
 	}
 	if (move == 1){
 		if (y >= 4 || cells[x][y + 1] != 0) return 0;
 		cells[x][y + 1] = cells[x][y];
-		moving_animation(x, y + 1, x, y);
+		//moving_animation(x, y + 1, x, y);
+		makeAnimation(x, y, x, y + 1);
 		cur.second++;
 	}
+	runAnimation(&Animation::move);
 	return 1;
 }
 
 void Game::Brick::merge(int u, int v) {
-	cur.first = -1;
-	// need animation merge (2-4 cell the same time)
+	int exp = 0;
+
+	// merge cell
+	if (v > 0 && cells[u][v - 1] == cells[u][v]) {
+		exp++;
+		makeAnimation(u, v - 1, u, v);
+	}
+	if (v < 4 && cells[u][v + 1] == cells[u][v]) {
+		exp++;
+		makeAnimation(u, v + 1, u, v);
+	}
+	if (u < 6 && cells[u + 1][v] == cells[u][v]) {
+		exp++;
+		makeAnimation(u + 1, v, u, v);
+	}
+	cells[u][v] *= (1 << exp);
 }
+
+void Game::Brick::fall() {
+	// fall cell
+	vector<pair<int, int>> Q;
+	while (1) {
+		Q.clear();
+		for (int j = 0; j < 5; ++j) {
+			bool need_fall = 0;
+			for (int i = 6; i >= 0; --i)
+				if (cells[i][j] == 0) {
+					need_fall = 1;
+				}
+				else if (need_fall) {
+					Q.push_back({i + 1, j});
+					cells[i + 1][j] = cells[i][j];
+					makeAnimation(i, j, i + 1, j);
+				}
+		}
+		
+		if (Q.size() == 0) break;
+		else {
+			for (auto& u : Q) {
+				merge(u.first, u.second);
+			}
+			runAnimation(&Animation::move);
+		}
+	}
+}
+

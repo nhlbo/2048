@@ -18,6 +18,10 @@ void Picture::setTexture(const char* _texture) {
 	m_shape.setTextureRect(sf::IntRect(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT));
 }
 
+void Picture::setColor(sf::Color color) {
+	m_shape.setColor(color);
+}
+
 void Picture::draw(sf::RenderWindow* window) {
 	window->draw(m_shape);
 }
