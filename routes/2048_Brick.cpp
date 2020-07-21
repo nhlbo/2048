@@ -82,20 +82,16 @@ void Game::Brick::start() {
 		if (Keyboard::isKeyPressed(Keyboard::Down) || Keyboard::isKeyPressed(Keyboard::S)) delay = milliseconds(5);
 
 		if (clock.getElapsedTime() > delay) {
+			clock.restart();
 			if (isGameOver) {
 				render();
 			}
-			else if (cur.first == -1) {
+			else if (cur.first == -1) {		// new cell
 				newCells();
 			}
-			else if (!moveCells(2)) {
-				merge(cur.first, cur.second);
-				runAnimation(&Animation::move);
-				fall();
-				cur.first = -1;
+			else if (!moveCells(2)) {		// cant move down
+				handle();
 			}
-			
-			clock.restart();
 		}
 	}
 }
@@ -223,7 +219,6 @@ void Game::Brick::newCells() {
 	if (cells[0][2] != 0) return;	// start cell
 	cur = { 0, 2 };
 	cells[0][2] = 1 << (rand() % 6 + 1);
-	//newcell_animation();
 	animation.push(cells[0][2].getShape(), Vector2f(0, 0));
 	runAnimation(&Animation::appear);
 }
@@ -233,21 +228,18 @@ bool Game::Brick::moveCells(int move) {
 	if (move == 2) {
 		if (x >= 6 || cells[x + 1][y] != 0) return 0;
 		cells[x + 1][y] = cells[x][y];
-		//moving_animation(x + 1, y, x, y);
 		makeAnimation(x, y, x + 1, y);
 		cur.first++;
 	}
 	if (move == 0) {
 		if (y <= 0 || cells[x][y - 1] != 0) return 0;
 		cells[x][y - 1] = cells[x][y];
-		//moving_animation(x, y - 1, x, y);
 		makeAnimation(x, y, x, y - 1);
 		cur.second--;
 	}
 	if (move == 1){
 		if (y >= 4 || cells[x][y + 1] != 0) return 0;
 		cells[x][y + 1] = cells[x][y];
-		//moving_animation(x, y + 1, x, y);
 		makeAnimation(x, y, x, y + 1);
 		cur.second++;
 	}
@@ -255,10 +247,11 @@ bool Game::Brick::moveCells(int move) {
 	return 1;
 }
 
-void Game::Brick::merge(int u, int v) {
-	int exp = 0;
-
+bool Game::Brick::merge(int u, int v) {
+	if (cells[u][v] == 0) return 0;
+	
 	// merge cell
+	int exp = 0;
 	if (v > 0 && cells[u][v - 1] == cells[u][v]) {
 		exp++;
 		makeAnimation(u, v - 1, u, v);
@@ -272,13 +265,32 @@ void Game::Brick::merge(int u, int v) {
 		makeAnimation(u + 1, v, u, v);
 	}
 	cells[u][v] *= (1 << exp);
+
+	return exp != 0;
 }
 
-void Game::Brick::fall() {
-	// fall cell
-	vector<pair<int, int>> Q;
-	while (1) {
-		Q.clear();
+void Game::Brick::handle() {
+	// Queue of merged cells
+	int t = 1;
+	vector<pair<int, int>> Q[2];
+	Time delay = microseconds(1);
+	Q[0].push_back(cur);
+	
+	// moving cell == cell need marge
+	while (!Q[t = !t].empty()) {
+		// merging cells
+		sleep(delay);
+		while (!Q[t].empty()) {
+			if (merge(Q[t].back().first, Q[t].back().second)) {
+				Q[!t].push_back(Q[t].back());
+			}
+			Q[t].pop_back();
+		}
+		runAnimation(&Animation::move);
+		render();
+		
+		// falling cells
+		sleep(delay);
 		for (int j = 0; j < 5; ++j) {
 			bool need_fall = 0;
 			for (int i = 6; i >= 0; --i)
@@ -286,19 +298,14 @@ void Game::Brick::fall() {
 					need_fall = 1;
 				}
 				else if (need_fall) {
-					Q.push_back({i + 1, j});
+					Q[!t].push_back({i + 1, j});
 					cells[i + 1][j] = cells[i][j];
 					makeAnimation(i, j, i + 1, j);
 				}
 		}
-		
-		if (Q.size() == 0) break;
-		else {
-			for (auto& u : Q) {
-				merge(u.first, u.second);
-			}
-			runAnimation(&Animation::move);
-		}
+		runAnimation(&Animation::move);
 	}
+
+	cur.first = -1;	// new cell
 }
 

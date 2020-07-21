@@ -23,10 +23,20 @@ End Project Date:
 ## Project Planner
 - [x] **Setup and using SFML lybrary**
 - [x] **More option**
-- [x] **2048 Classic**
-- [ ] **2048 Brick**
 - [x] **Animation**
 - [ ] **Resourcepacks**
+- [ ] **2048 Classic**
+  - [x] Gameplay
+  - [x] Control
+  - [x] Title
+  - [x] Save/load
+  - [ ] Texture
+- [ ] **2048 Brick**
+  - [x] Gameplay
+  - [ ] Control
+  - [ ] Title
+  - [ ] Save/load
+  - [ ] Textures
 ## How to play ?
 Use your arrow keys to move the tiles. When two tiles with the same number touch, they merge into one!
 

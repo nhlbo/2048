@@ -65,8 +65,8 @@ private:
 	void runAnimation(void (Animation::* animate)(RenderWindow*, Picture&));
 	void newCells();
 	bool moveCells(int move);	// 0 - left, 1 - right, 2 - down	(cur cell)
-	void merge(int u, int v);	// merge cell use recursion
-	void fall();				// fall all cells
+	bool merge(int u, int v);	// merge cell use recursion
+	void handle();				// all handle of board
 
 	bool isLose();
 	void saveBestScore();
