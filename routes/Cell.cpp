@@ -101,3 +101,5 @@ void Cell::operator+=(int val) { update(m_data + val); }
 
 void Cell::operator+=(const Cell& v) { update(m_data + v.m_data); }
 
+void Cell::operator*=(int val) { update(m_data * val); }
+

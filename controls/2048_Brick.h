@@ -3,6 +3,7 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <fstream>
+#include "Animation.h"
 #include "Resourcepack.h"
 #include "Button.h"
 #include "Cell.h"
@@ -24,6 +25,10 @@ private:
 	RenderWindow* window;
 	Resourcepack* res;
 	Music* music;
+
+	// Animation attribute
+	Animation animation;
+	RectangleShape copy[7][5];		// old-version of cells
 
 	Font font;
 	Picture background, frame;
@@ -56,11 +61,12 @@ private:
 	void renderText(Text& text, std::string str, Color color, int fontSize, int x, int y);
 
 	// Cells function: move, new, animation
-	void moving_animation(int i, int j, int u, int v);
-	void newcell_animation(int u = 0, int v = 2);
+	void makeAnimation(int i, int j, int u, int v);
+	void runAnimation(void (Animation::* animate)(RenderWindow*, Picture&));
 	void newCells();
-	bool moveCells(int move);		// 0 - left, 1 - right, 2 - down	(cur cell)
+	bool moveCells(int move);	// 0 - left, 1 - right, 2 - down	(cur cell)
 	void merge(int u, int v);	// merge cell use recursion
+	void fall();				// fall all cells
 
 	bool isLose();
 	void saveBestScore();
