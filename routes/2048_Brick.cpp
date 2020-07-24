@@ -7,7 +7,7 @@ void Game::Brick::init(RenderWindow* __window, Resourcepack* __res, Music* __mus
 
 	firstLoad = true;
 	bestScore = 0;
-	//loadBestScore();
+	loadBestScore();
 
 	for (int i = 0; i < 7; ++i)
 		for (int j = 0; j < 5; ++j) {
@@ -27,6 +27,7 @@ bool Game::Brick::loadResourcepack() {
 	res->setButton(bestScoreBoard, "bestscoreboard");
 	res->setButton(tryAgainButton, "tryagain");
 	res->setButton(backToMenu, "backtomenu");
+	res->setButton(back, "back");
 
 	Cell::setTexture(res->getTexture("block"));
 	background.setTexture(res->getTexture("background"));
@@ -52,27 +53,35 @@ void Game::Brick::start() {
 		Time delay = seconds(1);
 		while (window->pollEvent(e)) {
 			if (e.type == Event::Closed || (e.type == Event::KeyPressed && e.key.code == Keyboard::Escape)) {
-				//saveTable();
+				saveTable();
 				window->close();
 				return;
+			}
+			if (isGameOver) {
+				render();
 			}
 			if (e.type == Event::KeyPressed) {
 				if (e.key.code == Keyboard::Left || e.key.code == Keyboard::A) moveCells(0);
 				if (e.key.code == Keyboard::Right || e.key.code == Keyboard::D) moveCells(1);
 			}
-			if (cells[cur.first - 1][cur.second] != 0) {
+			/*if (cells[cur.first - 1][cur.second] != 0) {
 
-			}
+			}*/
 			if (e.type == Event::MouseButtonReleased) {
 				if (newGameButton.clicked(window)) {
 					newGame();
+				}
+				if (back.clicked(window)) {
+					saveTable();
+					firstLoad = true;
+					return;
 				}
 				if (isGameOver) {
 					if (tryAgainButton.clicked(window)) {
 						newGame();
 					}
 					else if (backToMenu.clicked(window)) {
-						//saveTable();
+						saveTable();
 						firstLoad = true;
 						return;	// back Game::Mainmenu
 					}
@@ -122,16 +131,15 @@ void Game::Brick::draw(Cell cell[7][5], int remove_i, int remove_j) {
 void Game::Brick::display() { window->display(); }
 
 void Game::Brick::newGame() {
-	if (0 && firstLoad) {
+	isGameOver = false;
+	cur = { -1, 2 };
+	if (firstLoad) {
 		firstLoad = false;
-		cur;
-		//loadTable();
-		//isLose();
+		loadTable();
+		isLose();
 	}
 	else {
-		isGameOver = false;
 		score = 0;
-		cur = { -1, 2 };
 		for (int i = 0; i < 7; i++)
 			for (int j = 0; j < 5; j++) {
 				cells[i][j] = 0;
@@ -143,15 +151,15 @@ void Game::Brick::newGame() {
 }
 
 void Game::Brick::update() {
+	if (score > bestScore) {
+		bestScore = score;
+		saveBestScore();
+	}
+
 	renderText(scoreTitle, to_string(score), Color::White, 15, 565, 165);
 	scoreTitle.setPosition(805 - scoreTitle.getLocalBounds().width / 2, 155);
 	renderText(bestScoreTitle, to_string(bestScore), Color::White, 15, 565, 235);
 	bestScoreTitle.setPosition(805 - bestScoreTitle.getLocalBounds().width / 2, 225);
-
-	if (score > bestScore) {
-		bestScore = score;
-		//saveBestScore();
-	}
 }
 
 void Game::Brick::render() {
@@ -163,7 +171,8 @@ void Game::Brick::render() {
 	draw(bestScoreBoard);
 	draw(bestScoreTitle);
 	draw(cells);
-	//draw(frame);
+	draw(frame);
+	draw(back);
 
 	if (isGameOver) {
 		draw(loseBackground);
@@ -190,10 +199,12 @@ void Game::Brick::makeAnimation(int i, int j, int u, int v) {
 }
 
 void Game::Brick::runAnimation(void(Animation::* animate)(RenderWindow*, Picture&)) {
+	update();
 	// make window background for animation
 	clear(Color::White);
 	draw(background);
 	draw(newGameButton);
+	draw(back);
 	draw(scoreBoard);
 	draw(scoreTitle);
 	draw(bestScoreBoard);
@@ -216,7 +227,10 @@ void Game::Brick::runAnimation(void(Animation::* animate)(RenderWindow*, Picture
 }
 
 void Game::Brick::newCells() {
-	if (cells[0][2] != 0) return;	// start cell
+	if (cells[0][2] != 0) {
+		isLose();
+		return; // start cell
+	}
 	cur = { 0, 2 };
 	cells[0][2] = 1 << (rand() % 6 + 1);
 	animation.push(cells[0][2].getShape(), Vector2f(0, 0));
@@ -254,14 +268,17 @@ bool Game::Brick::merge(int u, int v) {
 	int exp = 0;
 	if (v > 0 && cells[u][v - 1] == cells[u][v]) {
 		exp++;
+		score += cells[u][v - 1].getVal();
 		makeAnimation(u, v - 1, u, v);
 	}
 	if (v < 4 && cells[u][v + 1] == cells[u][v]) {
 		exp++;
+		score += cells[u][v + 1].getVal();
 		makeAnimation(u, v + 1, u, v);
 	}
 	if (u < 6 && cells[u + 1][v] == cells[u][v]) {
 		exp++;
+		score += cells[u + 1][v].getVal();
 		makeAnimation(u + 1, v, u, v);
 	}
 	cells[u][v] *= (1 << exp);
@@ -309,3 +326,56 @@ void Game::Brick::handle() {
 	cur.first = -1;	// new cell
 }
 
+bool Game::Brick::isLose() {
+	return cells[0][2] != 0 ? true, isGameOver = true : false;
+}
+
+void Game::Brick::saveBestScore() {
+	fstream f;
+	remove("data/best_score_brick.txt");
+	f.open("data/best_score_brick.txt", ios::out);
+	f << score;
+	f.close();
+}
+
+void Game::Brick::loadBestScore() {
+	int s;
+	fstream f;
+	f.open("data/best_score_brick.txt", ios::in);
+	f >> s;
+	f.close();
+	s != 0 ? bestScore = s : bestScore = 0;
+}
+
+void Game::Brick::saveTable() {
+	fstream fTemp;
+	fTemp.open("data/temp.txt", ios::out);
+	for (int i = 0; i < 7; i++) {
+		for (int j = 0; j < 5; j++) {
+			if (i != 6 && cells[i + 1][j] == 0)
+				fTemp << 0 << " ";
+			else
+				fTemp << cells[i][j].getVal() << " ";
+		}
+		fTemp << endl;
+	}
+	fTemp << score;
+	fTemp.close();
+	remove("data/table_brick.txt");
+	rename("data/temp.txt", "data/table_brick.txt");
+}
+
+void Game::Brick::loadTable() {
+	fstream f;
+	f.open("data/table_brick.txt");
+	if (!f.is_open()) return;
+	for (int i = 0; i < 7; i++)
+		for (int j = 0; j < 5; j++) {
+			int x;
+			f >> x;
+			cells[i][j] = x;
+			copy[i][j] = cells[i][j].getShape();
+		}
+	f >> score;
+	f.close();
+}

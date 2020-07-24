@@ -27,6 +27,7 @@ bool Game::Classic::loadResourcepack() {
 	res->setButton(bestScoreBoard, "bestscoreboard");
 	res->setButton(tryAgainButton, "tryagain");
 	res->setButton(backToMenu, "backtomenu");
+	res->setButton(back, "back");
 
 	Cell::setTexture(res->getTexture("block"));
 	background.setTexture(res->getTexture("background"));
@@ -66,6 +67,11 @@ void Game::Classic::start() {
 			if (e.type == Event::MouseButtonReleased) {
 				if (newGameButton.clicked(window)) {
 					newGame();
+				}
+				if (back.clicked(window)) {
+					saveTable();
+					firstLoad = true;
+					return;
 				}
 				if (isGameOver) {
 					if (tryAgainButton.clicked(window)) {
@@ -114,13 +120,15 @@ void Game::Classic::draw(Cell cell[4][4], int remove_i, int remove_j) {
 void Game::Classic::display() { window->display(); }
 
 void Game::Classic::newGame() {
+	isGameOver = false;
 	if (firstLoad) {
 		firstLoad = false;
 		loadTable();
 		isLose();
+		if (!isGameOver)
+			newCells();
 	}
 	else {
-		isGameOver = false;
 		score = 0;
 		for (int i = 0; i < 4; i++)
 			for (int j = 0; j < 4; j++) {
@@ -134,15 +142,15 @@ void Game::Classic::newGame() {
 }
 
 void Game::Classic::update() {
-	renderText(scoreTitle, to_string(score), Color::White, 15, 565, 165);
-	scoreTitle.setPosition(805 - scoreTitle.getLocalBounds().width / 2, 155);
-	renderText(bestScoreTitle, to_string(bestScore), Color::White, 15, 565, 235);
-	bestScoreTitle.setPosition(805 - bestScoreTitle.getLocalBounds().width / 2, 225);
-
 	if (score > bestScore) {
 		bestScore = score;
 		saveBestScore();
 	}
+	
+	renderText(scoreTitle, to_string(score), Color::White, 15, 565, 165);
+	scoreTitle.setPosition(805 - scoreTitle.getLocalBounds().width / 2, 155);
+	renderText(bestScoreTitle, to_string(bestScore), Color::White, 15, 565, 235);
+	bestScoreTitle.setPosition(805 - bestScoreTitle.getLocalBounds().width / 2, 225);
 }
 
 void Game::Classic::render() {
@@ -153,6 +161,7 @@ void Game::Classic::render() {
 	draw(scoreTitle);
 	draw(bestScoreBoard);
 	draw(bestScoreTitle);
+	draw(back);
 	draw(cells);
 	draw(frame);
 
@@ -185,6 +194,7 @@ void Game::Classic::runAnimation(void(Animation::*animate)(RenderWindow*, Pictur
 	clear(Color::White);
 	draw(background);
 	draw(newGameButton);
+	draw(back);
 	draw(scoreBoard);
 	draw(scoreTitle);
 	draw(bestScoreBoard);
@@ -245,7 +255,7 @@ bool Game::Classic::moveLeft() {
 					}
 					else if (cells[i][k] == cells[i][j]) {
 						cells[i][k] += cells[i][j];
-						score += cells[i][j].getVal();
+						score += (cells[i][j].getVal());
 						makeAnimation(i, j, i, k);
 					}
 					else if (k == 0 && cells[i][k] == 0) {
@@ -277,7 +287,7 @@ bool Game::Classic::moveRight() {
 					}
 					else if (cells[i][k] == cells[i][j]) {
 						cells[i][k] += cells[i][j];
-						score += cells[i][j].getVal();
+						score += (cells[i][j].getVal());
 						makeAnimation(i, j, i, k);
 					}
 					else if (k == 4 - 1 && cells[i][k] == 0) {
@@ -309,7 +319,7 @@ bool Game::Classic::moveUp() {
 					}
 					else if (cells[k][j] == cells[i][j]) {
 						cells[k][j] += cells[i][j];
-						score += cells[i][j].getVal();
+						score += (cells[i][j].getVal());
 						makeAnimation(i, j, k, j);
 					}
 					else if (k == 0 && cells[k][j] == 0) {
@@ -341,7 +351,7 @@ bool Game::Classic::moveDown() {
 					}
 					else if (cells[k][j] == cells[i][j]) {
 						cells[k][j] += cells[i][j];
-						score += cells[i][j].getVal();
+						score += (cells[i][j].getVal());
 						makeAnimation(i, j, k, j);
 					}
 					else if (k == 4 - 1 && cells[k][j] == 0) {
@@ -405,6 +415,7 @@ void Game::Classic::saveTable() {
 		}
 		fTemp << endl;
 	}
+	fTemp << score;
 	fTemp.close();
 	remove("data/table.txt");
 	rename("data/temp.txt", "data/table.txt");
@@ -423,5 +434,6 @@ void Game::Classic::loadTable() {
 				f >> x;
 				cells[i][j] = x;
 			}
+	f >> score;
 	f.close();
 }

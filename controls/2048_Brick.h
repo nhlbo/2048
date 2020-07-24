@@ -33,7 +33,7 @@ private:
 	Font font;
 	Picture background, frame;
 	RectangleShape loseBackground;
-	Button newGameButton, scoreBoard, bestScoreBoard, tryAgainButton, backToMenu;
+	Button newGameButton, scoreBoard, bestScoreBoard, tryAgainButton, backToMenu, back;
 	Text scoreTitle, bestScoreTitle, loseTitle;
 	pair<int,int> cur;
 	Cell cells[7][5], next;
