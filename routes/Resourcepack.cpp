@@ -118,11 +118,11 @@ void G2048::Skin::open() {
 				if (MENU_X <= coorMouse.x && coorMouse.x <= MENU_X + MENU_WIDTH &&
 					MENU_Y <= coorMouse.y && coorMouse.y <= MENU_Y + menu.getLocalBounds().height) {
 
-					if (e.mouseWheel.delta == 1 && position + SKINS < m_list.size()) {
+					if (e.mouseWheel.delta == -1 && position + SKINS < m_list.size()) {
 						position++;
 						render(background);
 					}
-					else if (e.mouseWheel.delta == -1 && position > 0) {
+					else if (e.mouseWheel.delta == 1 && position > 0) {
 						position--;
 						render(background);
 					}
