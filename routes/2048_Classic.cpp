@@ -1,6 +1,6 @@
 #include "..\controls\2048_Classic.h"
 
-void Game::Classic::init(RenderWindow* __window, Resourcepack* __res, Music* __music) {
+void G2048::Classic::init(RenderWindow* __window, Resourcepack* __res, Music* __music) {
 	window = __window;
 	res = __res;
 	music = __music;
@@ -19,10 +19,10 @@ void Game::Classic::init(RenderWindow* __window, Resourcepack* __res, Music* __m
 		}
 }
 
-bool Game::Classic::loadResourcepack() {
+bool G2048::Classic::loadResourcepack() {
 	font.loadFromFile(res->getFont());
 
-	res->setButton(newGameButton, "newgamebutton");
+	res->setButton(newGameButton, "newgame");
 	res->setButton(scoreBoard, "scoreboard");
 	res->setButton(bestScoreBoard, "bestscoreboard");
 	res->setButton(tryAgainButton, "tryagain");
@@ -30,8 +30,8 @@ bool Game::Classic::loadResourcepack() {
 	res->setButton(back, "back");
 
 	Cell::setTexture(res->getTexture("block"));
-	background.setTexture(res->getTexture("background"));
-	frame.setTexture(res->getTexture("frame"));
+	background.setTexture(res->getTexture("background", "classic"));
+	frame.setTexture(res->getTexture("frame", "classic"));
 
 	loseBackground.setFillColor(Color(238, 228, 218, 150));
 	loseBackground.setPosition(Vector2f(10, 10));
@@ -40,7 +40,7 @@ bool Game::Classic::loadResourcepack() {
 	return 1;
 }
 
-void Game::Classic::start() {
+void G2048::Classic::start() {
 	newGame();
 	while (window->isOpen()) {
 		if (music->getStatus() == sf::Sound::Status::Stopped) {
@@ -95,21 +95,21 @@ void Game::Classic::start() {
 	}
 }
 
-void Game::Classic::clear(Color color) { window->clear(color); }
+void G2048::Classic::clear(Color color) { window->clear(color); }
 
-void Game::Classic::draw(RectangleShape& shape) { window->draw(shape); }
+void G2048::Classic::draw(RectangleShape& shape) { window->draw(shape); }
 
-void Game::Classic::draw(Sprite& shape) { window->draw(shape); }
+void G2048::Classic::draw(Sprite& shape) { window->draw(shape); }
 
-void Game::Classic::draw(Picture& picture) { picture.draw(window); }
+void G2048::Classic::draw(Picture& picture) { picture.draw(window); }
 
-void Game::Classic::draw(Button& button) { button.draw(window); }
+void G2048::Classic::draw(Button& button) { button.draw(window); }
 
-void Game::Classic::draw(Text& text) { window->draw(text); }
+void G2048::Classic::draw(Text& text) { window->draw(text); }
 
-void Game::Classic::draw(Cell& cell) { cell.draw(window); }
+void G2048::Classic::draw(Cell& cell) { cell.draw(window); }
 
-void Game::Classic::draw(Cell cell[4][4], int remove_i, int remove_j) {
+void G2048::Classic::draw(Cell cell[4][4], int remove_i, int remove_j) {
 	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 4; j++) {
 			if (i == remove_i && j == remove_j) continue;
@@ -117,9 +117,9 @@ void Game::Classic::draw(Cell cell[4][4], int remove_i, int remove_j) {
 		}
 }
 
-void Game::Classic::display() { window->display(); }
+void G2048::Classic::display() { window->display(); }
 
-void Game::Classic::newGame() {
+void G2048::Classic::newGame() {
 	isGameOver = false;
 	if (firstLoad) {
 		firstLoad = false;
@@ -141,7 +141,7 @@ void Game::Classic::newGame() {
 	render();
 }
 
-void Game::Classic::update() {
+void G2048::Classic::update() {
 	if (score > bestScore) {
 		bestScore = score;
 		saveBestScore();
@@ -153,7 +153,7 @@ void Game::Classic::update() {
 	bestScoreTitle.setPosition(805 - bestScoreTitle.getLocalBounds().width / 2, 225);
 }
 
-void Game::Classic::render() {
+void G2048::Classic::render() {
 	clear(Color::White);
 	draw(background);
 	draw(newGameButton);
@@ -175,7 +175,7 @@ void Game::Classic::render() {
 	display();
 }
 
-void Game::Classic::renderText(Text& text, string str, Color color, int fontSize, int x, int y) {
+void G2048::Classic::renderText(Text& text, string str, Color color, int fontSize, int x, int y) {
 	text.setFont(font);
 	text.setString(str);
 	text.setCharacterSize(fontSize);
@@ -183,13 +183,13 @@ void Game::Classic::renderText(Text& text, string str, Color color, int fontSize
 	text.setPosition(x, y);
 }
 
-void Game::Classic::makeAnimation(int i, int j, int u, int v) {
+void G2048::Classic::makeAnimation(int i, int j, int u, int v) {
 	animation.push(cells[i][j].getShape(), cells[i][j].distance(cells[u][v]));
 	copy[i][j].setSize(Vector2f(0, 0));						// setSize = (0, 0) to disable this cell
 	cells[i][j] = 0;
 }
 
-void Game::Classic::runAnimation(void(Animation::*animate)(RenderWindow*, Picture&)) {
+void G2048::Classic::runAnimation(void(Animation::*animate)(RenderWindow*, Picture&)) {
 	// make window background for animation
 	clear(Color::White);
 	draw(background);
@@ -201,7 +201,7 @@ void Game::Classic::runAnimation(void(Animation::*animate)(RenderWindow*, Pictur
 	draw(bestScoreTitle);
 	for (int i = 0; i < 4; ++i)
 		for (int j = 0; j < 4; ++j) {
-			if (copy[i][j].getSize() != Vector2f(0, 0)) {	// setSize = (0, 0) to disable this cell
+			if (copy[i][j].getSize() != Vector2f(0, 0) && copy[i][j].getTextureRect().left) {
 				draw(copy[i][j]);
 			}
 		}
@@ -216,7 +216,7 @@ void Game::Classic::runAnimation(void(Animation::*animate)(RenderWindow*, Pictur
 		}
 }
 
-void Game::Classic::newCells(int time) {
+void G2048::Classic::newCells(int time) {
 	while (1) {
 		int emptyCells = 0;
 		for (int i = 0; i < 4; ++i)
@@ -239,7 +239,7 @@ void Game::Classic::newCells(int time) {
 	runAnimation(&Animation::appear);
 }
 
-bool Game::Classic::moveLeft() {
+bool G2048::Classic::moveLeft() {
 	//cerr << "Press Left" << endl;
 	bool moved = 0;
 	for (int j = 1; j < 4; ++j)
@@ -271,7 +271,7 @@ bool Game::Classic::moveLeft() {
 	return moved;
 }
 
-bool Game::Classic::moveRight() {
+bool G2048::Classic::moveRight() {
 	//cerr << "Press Right" << endl;
 	bool moved = 0;
 	for (int j = 4 - 2; j >= 0; --j)
@@ -303,7 +303,7 @@ bool Game::Classic::moveRight() {
 	return moved;
 }
 
-bool Game::Classic::moveUp() {
+bool G2048::Classic::moveUp() {
 	//cerr << "Press Up" << endl;
 	bool moved = 0;
 	for (int i = 1; i < 4; ++i)
@@ -335,7 +335,7 @@ bool Game::Classic::moveUp() {
 	return moved;
 }
 
-bool Game::Classic::moveDown() {
+bool G2048::Classic::moveDown() {
 	//cerr << "Press Down" << endl;
 	bool moved = 0;
 	for (int i = 4 - 2; i >= 0; --i)
@@ -367,7 +367,7 @@ bool Game::Classic::moveDown() {
 	return moved;
 }
 
-bool Game::Classic::isLose() {
+bool G2048::Classic::isLose() {
 	int check = -1;
 
 	for (int i = 0; i < 4; i++) {
@@ -388,7 +388,7 @@ bool Game::Classic::isLose() {
 	return check < 0 ? isGameOver = true, true : false;
 }
 
-void Game::Classic::saveBestScore() {
+void G2048::Classic::saveBestScore() {
 	fstream f;
 	remove("data/best_score.txt");
 	f.open("data/best_score.txt", ios::out);
@@ -396,7 +396,7 @@ void Game::Classic::saveBestScore() {
 	f.close();
 }
 
-void Game::Classic::loadBestScore() {
+void G2048::Classic::loadBestScore() {
 	int s;
 	fstream f;
 	f.open("data/best_score.txt", ios::in);
@@ -405,7 +405,7 @@ void Game::Classic::loadBestScore() {
 	s != 0 ? bestScore = s : bestScore = 0;
 }
 
-void Game::Classic::saveTable() {
+void G2048::Classic::saveTable() {
 	fstream fTemp;
 	fTemp.open("data/temp.txt", ios::out);
 	fTemp << 4 << " " << 4 << endl;
@@ -421,7 +421,7 @@ void Game::Classic::saveTable() {
 	rename("data/temp.txt", "data/table.txt");
 }
 
-void Game::Classic::loadTable() {
+void G2048::Classic::loadTable() {
 	fstream f;
 	f.open("data/table.txt");
 	if (!f.is_open()) return;

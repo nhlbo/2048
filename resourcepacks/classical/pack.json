@@ -4,109 +4,117 @@
     "sounds": {
         "music": "tom_talking.wav"
     },
-  "textures": {
-    "background": "background.png",
-    "back": {
-      "link": "back.png",
-      "position": [
-        750,
-        460
-      ],
-      "size": [
-        110,
-        32
-      ]
-    },
-    "backtomenu": {
-      "link": "backtomenu.png",
-      "position": [
-        230,
-        430
-      ],
-      "size": [
-        220,
-        74
-      ]
-    },
-    "bestscoreboard": {
-      "link": "bestscore.png",
-      "position": [
-        750,
-        200
-      ],
-      "size": [
-        110,
-        50
-      ]
-    },
-    "block": "block.png",
-    "brickbutton": {
-      "link": "brick.png",
-      "position": [
-        750,
-        200
-      ],
-      "size": [
-        110,
-        32
-      ]
-    },
-    "classicbutton": {
-      "link": "classic.png",
-      "position": [
-        750,
-        70
-      ],
-      "size": [
-        110,
-        32
-      ]
-    },
-    "frame": "frame.png",
-    "mainmenu": "mainmenu.png",
-    "newgamebutton": {
-      "link": "newgame.png",
-      "position": [
-        750,
-        70
-      ],
-      "size": [
-        110,
-        32
-      ]
-    },
-    "resoubutton": {
-      "link": "resourcepack.png",
-      "position": [
-        750,
-        330
-      ],
-      "size": [
-        110,
-        32
-      ]
-    },
-    "scoreboard": {
-      "link": "score.png",
-      "position": [
-        750,
-        130
-      ],
-      "size": [
-        110,
-        50
-      ]
-    },
-    "tryagain": {
-      "link": "tryagain.png",
-      "position": [
-        230,
-        315
-      ],
-      "size": [
-        220,
-        74
-      ]
+    "textures": {
+        "background": {
+            "brick": "brick/background.png",
+            "classic": "classic/background.png"
+        },
+        "block": "block.png",
+        "buttons": {
+            "back": {
+                "link": "buttons/mainmenu.png",
+                "position": [
+                    750,
+                    460
+                ],
+                "size": [
+                    110,
+                    32
+                ]
+            },
+            "backtomenu": {
+                "link": "buttons/mainmenu.png",
+                "position": [
+                    230,
+                    430
+                ],
+                "size": [
+                    220,
+                    74
+                ]
+            },
+            "bestscoreboard": {
+                "link": "buttons/bestscore.png",
+                "position": [
+                    750,
+                    200
+                ],
+                "size": [
+                    110,
+                    50
+                ]
+            },
+            "brick": {
+                "link": "buttons/brick.png",
+                "position": [
+                    750,
+                    200
+                ],
+                "size": [
+                    110,
+                    32
+                ]
+            },
+            "classic": {
+                "link": "buttons/classic.png",
+                "position": [
+                    750,
+                    70
+                ],
+                "size": [
+                    110,
+                    32
+                ]
+            },
+            "newgame": {
+                "link": "buttons/newgame.png",
+                "position": [
+                    750,
+                    70
+                ],
+                "size": [
+                    110,
+                    32
+                ]
+            },
+            "scoreboard": {
+                "link": "buttons/score.png",
+                "position": [
+                    750,
+                    130
+                ],
+                "size": [
+                    110,
+                    50
+                ]
+            },
+            "newskin": {
+                "link": "buttons/newskin.png",
+                "position": [
+                    750,
+                    330
+                ],
+                "size": [
+                    110,
+                    32
+                ]
+            },
+            "tryagain": {
+                "link": "buttons/tryagain.png",
+                "position": [
+                    230,
+                    315
+                ],
+                "size": [
+                    220,
+                    74
+                ]
+            }
+        },
+        "frame": {
+            "brick": "brick/frame.png",
+            "classic": "classic/frame.png"
+        },
+        "mainmenu": "mainmenu.png"
     }
-  }
 }

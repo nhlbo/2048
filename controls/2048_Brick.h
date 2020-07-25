@@ -1,8 +1,5 @@
 #ifndef _2048_BRICK_H
 #define _2048_BRICK_H
-#include <SFML/Audio.hpp>
-#include <SFML/Graphics.hpp>
-#include <fstream>
 #include "Animation.h"
 #include "Resourcepack.h"
 #include "Button.h"
@@ -12,9 +9,9 @@
 using namespace sf;
 using namespace std;
 
-namespace Game { class Brick; }
+namespace G2048 { class Brick; }
 
-class Game::Brick {
+class G2048::Brick {
 public:
 	void init(RenderWindow* __window, Resourcepack* __res, Music* __music);
 	bool loadResourcepack();

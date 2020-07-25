@@ -1,6 +1,6 @@
 #include "..\controls\2048_Brick.h"
 
-void Game::Brick::init(RenderWindow* __window, Resourcepack* __res, Music* __music) {
+void G2048::Brick::init(RenderWindow* __window, Resourcepack* __res, Music* __music) {
 	window = __window;
 	res = __res;
 	music = __music;
@@ -8,6 +8,9 @@ void Game::Brick::init(RenderWindow* __window, Resourcepack* __res, Music* __mus
 	firstLoad = true;
 	bestScore = 0;
 	loadBestScore();
+
+	next.setSize(90, 90);
+	next.setPosition(760, 301);
 
 	for (int i = 0; i < 7; ++i)
 		for (int j = 0; j < 5; ++j) {
@@ -19,10 +22,10 @@ void Game::Brick::init(RenderWindow* __window, Resourcepack* __res, Music* __mus
 		}
 }
 
-bool Game::Brick::loadResourcepack() {
+bool G2048::Brick::loadResourcepack() {
 	font.loadFromFile(res->getFont());
 
-	res->setButton(newGameButton, "newgamebutton");
+	res->setButton(newGameButton, "newgame");
 	res->setButton(scoreBoard, "scoreboard");
 	res->setButton(bestScoreBoard, "bestscoreboard");
 	res->setButton(tryAgainButton, "tryagain");
@@ -30,9 +33,8 @@ bool Game::Brick::loadResourcepack() {
 	res->setButton(back, "back");
 
 	Cell::setTexture(res->getTexture("block"));
-	background.setTexture(res->getTexture("background"));
-	frame.setTexture(res->getTexture("frame"));
-	frame.setColor(Color(0, 0, 0, 0));
+	background.setTexture(res->getTexture("background", "brick"));
+	frame.setTexture(res->getTexture("frame", "brick"));
 
 	loseBackground.setFillColor(Color(238, 228, 218, 150));
 	loseBackground.setPosition(Vector2f(10, 10));
@@ -41,9 +43,10 @@ bool Game::Brick::loadResourcepack() {
 	return 1;
 }
 
-void Game::Brick::start() {
+void G2048::Brick::start() {
 	newGame();
 	Clock clock;
+	newCells();
 	while (window->isOpen()) {
 		if (music->getStatus() == sf::Sound::Status::Stopped) {
 			music->openFromFile(res->getNextSound("music"));
@@ -51,7 +54,7 @@ void Game::Brick::start() {
 		}
 		Event e;
 		Time delay = seconds(1);
-		while (window->pollEvent(e)) {
+		if (window->pollEvent(e)) {
 			if (e.type == Event::Closed || (e.type == Event::KeyPressed && e.key.code == Keyboard::Escape)) {
 				saveTable();
 				window->close();
@@ -64,9 +67,6 @@ void Game::Brick::start() {
 				if (e.key.code == Keyboard::Left || e.key.code == Keyboard::A) moveCells(0);
 				if (e.key.code == Keyboard::Right || e.key.code == Keyboard::D) moveCells(1);
 			}
-			/*if (cells[cur.first - 1][cur.second] != 0) {
-
-			}*/
 			if (e.type == Event::MouseButtonReleased) {
 				if (newGameButton.clicked(window)) {
 					newGame();
@@ -88,39 +88,37 @@ void Game::Brick::start() {
 				}
 			}
 		}
-		if (Keyboard::isKeyPressed(Keyboard::Down) || Keyboard::isKeyPressed(Keyboard::S)) delay = milliseconds(5);
 
+		if (Keyboard::isKeyPressed(Keyboard::Down) || Keyboard::isKeyPressed(Keyboard::S)) delay = milliseconds(5);
 		if (clock.getElapsedTime() > delay) {
 			clock.restart();
 			if (isGameOver) {
 				render();
 			}
-			else if (cur.first == -1) {		// new cell
-				newCells();
-			}
 			else if (!moveCells(2)) {		// cant move down
 				handle();
+				newCells();
 			}
 		}
 	}
 }
 
 
-void Game::Brick::clear(Color color) { window->clear(color); }
+void G2048::Brick::clear(Color color) { window->clear(color); }
 
-void Game::Brick::draw(RectangleShape& shape) { window->draw(shape); }
+void G2048::Brick::draw(RectangleShape& shape) { window->draw(shape); }
 
-void Game::Brick::draw(Sprite& shape) { window->draw(shape); }
+void G2048::Brick::draw(Sprite& shape) { window->draw(shape); }
 
-void Game::Brick::draw(Picture& picture) { picture.draw(window); }
+void G2048::Brick::draw(Picture& picture) { picture.draw(window); }
 
-void Game::Brick::draw(Button& button) { button.draw(window); }
+void G2048::Brick::draw(Button& button) { button.draw(window); }
 
-void Game::Brick::draw(Text& text) { window->draw(text); }
+void G2048::Brick::draw(Text& text) { window->draw(text); }
 
-void Game::Brick::draw(Cell& cell) { cell.draw(window); }
+void G2048::Brick::draw(Cell& cell) { cell.draw(window); }
 
-void Game::Brick::draw(Cell cell[7][5], int remove_i, int remove_j) {
+void G2048::Brick::draw(Cell cell[7][5], int remove_i, int remove_j) {
 	for (int i = 0; i < 7; i++)
 		for (int j = 0; j < 5; j++) {
 			if (i == remove_i && j == remove_j) continue;
@@ -128,11 +126,14 @@ void Game::Brick::draw(Cell cell[7][5], int remove_i, int remove_j) {
 		}
 }
 
-void Game::Brick::display() { window->display(); }
+void G2048::Brick::display() { window->display(); }
 
-void Game::Brick::newGame() {
+void G2048::Brick::newGame() {
 	isGameOver = false;
+
+	next = 1 << (rand() % 6 + 1);
 	cur = { -1, 2 };
+
 	if (firstLoad) {
 		firstLoad = false;
 		loadTable();
@@ -150,7 +151,7 @@ void Game::Brick::newGame() {
 	render();
 }
 
-void Game::Brick::update() {
+void G2048::Brick::update() {
 	if (score > bestScore) {
 		bestScore = score;
 		saveBestScore();
@@ -162,7 +163,7 @@ void Game::Brick::update() {
 	bestScoreTitle.setPosition(805 - bestScoreTitle.getLocalBounds().width / 2, 225);
 }
 
-void Game::Brick::render() {
+void G2048::Brick::render() {
 	clear(Color::White);
 	draw(background);
 	draw(newGameButton);
@@ -170,6 +171,7 @@ void Game::Brick::render() {
 	draw(scoreTitle);
 	draw(bestScoreBoard);
 	draw(bestScoreTitle);
+	draw(next);
 	draw(cells);
 	draw(frame);
 	draw(back);
@@ -184,7 +186,7 @@ void Game::Brick::render() {
 	display();
 }
 
-void Game::Brick::renderText(Text& text, string str, Color color, int fontSize, int x, int y) {
+void G2048::Brick::renderText(Text& text, string str, Color color, int fontSize, int x, int y) {
 	text.setFont(font);
 	text.setString(str);
 	text.setCharacterSize(fontSize);
@@ -192,13 +194,13 @@ void Game::Brick::renderText(Text& text, string str, Color color, int fontSize, 
 	text.setPosition(x, y);
 }
 
-void Game::Brick::makeAnimation(int i, int j, int u, int v) {
+void G2048::Brick::makeAnimation(int i, int j, int u, int v) {
 	animation.push(cells[i][j].getShape(), cells[i][j].distance(cells[u][v]));
 	copy[i][j].setSize(Vector2f(0, 0));						// setSize = (0, 0) to disable this cell
 	cells[i][j] = 0;
 }
 
-void Game::Brick::runAnimation(void(Animation::* animate)(RenderWindow*, Picture&)) {
+void G2048::Brick::runAnimation(void(Animation::* animate)(RenderWindow*, Picture&)) {
 	update();
 	// make window background for animation
 	clear(Color::White);
@@ -209,9 +211,10 @@ void Game::Brick::runAnimation(void(Animation::* animate)(RenderWindow*, Picture
 	draw(scoreTitle);
 	draw(bestScoreBoard);
 	draw(bestScoreTitle);
+	draw(next);
 	for (int i = 0; i < 7; ++i)
 		for (int j = 0; j < 5; ++j) {
-			if (copy[i][j].getSize() != Vector2f(0, 0)) {	// setSize = (0, 0) to disable this cell
+			if (copy[i][j].getSize() != Vector2f(0, 0) && copy[i][j].getTextureRect().left) {
 				draw(copy[i][j]);
 			}
 		}
@@ -226,19 +229,23 @@ void Game::Brick::runAnimation(void(Animation::* animate)(RenderWindow*, Picture
 		}
 }
 
-void Game::Brick::newCells() {
+void G2048::Brick::newCells() {
 	if (cells[0][2] != 0) {
 		isLose();
 		return; // start cell
 	}
 	cur = { 0, 2 };
-	cells[0][2] = 1 << (rand() % 6 + 1);
+
+	cells[0][2] = next;
+	next = 1 << (rand() % 6 + 1);
+
 	animation.push(cells[0][2].getShape(), Vector2f(0, 0));
 	runAnimation(&Animation::appear);
 }
 
-bool Game::Brick::moveCells(int move) {
+bool G2048::Brick::moveCells(int move) {
 	int x = cur.first, y = cur.second;
+	if (x < 0 || x > 6 || y < 0 || y > 4) return 0;
 	if (move == 2) {
 		if (x >= 6 || cells[x + 1][y] != 0) return 0;
 		cells[x + 1][y] = cells[x][y];
@@ -261,7 +268,7 @@ bool Game::Brick::moveCells(int move) {
 	return 1;
 }
 
-bool Game::Brick::merge(int u, int v) {
+bool G2048::Brick::merge(int u, int v) {
 	if (cells[u][v] == 0) return 0;
 	
 	// merge cell
@@ -286,7 +293,7 @@ bool Game::Brick::merge(int u, int v) {
 	return exp != 0;
 }
 
-void Game::Brick::handle() {
+void G2048::Brick::handle() {
 	// Queue of merged cells
 	int t = 1;
 	vector<pair<int, int>> Q[2];
@@ -326,11 +333,11 @@ void Game::Brick::handle() {
 	cur.first = -1;	// new cell
 }
 
-bool Game::Brick::isLose() {
+bool G2048::Brick::isLose() {
 	return cells[0][2] != 0 ? true, isGameOver = true : false;
 }
 
-void Game::Brick::saveBestScore() {
+void G2048::Brick::saveBestScore() {
 	fstream f;
 	remove("data/best_score_brick.txt");
 	f.open("data/best_score_brick.txt", ios::out);
@@ -338,7 +345,7 @@ void Game::Brick::saveBestScore() {
 	f.close();
 }
 
-void Game::Brick::loadBestScore() {
+void G2048::Brick::loadBestScore() {
 	int s;
 	fstream f;
 	f.open("data/best_score_brick.txt", ios::in);
@@ -347,7 +354,7 @@ void Game::Brick::loadBestScore() {
 	s != 0 ? bestScore = s : bestScore = 0;
 }
 
-void Game::Brick::saveTable() {
+void G2048::Brick::saveTable() {
 	fstream fTemp;
 	fTemp.open("data/temp.txt", ios::out);
 	for (int i = 0; i < 7; i++) {
@@ -365,7 +372,7 @@ void Game::Brick::saveTable() {
 	rename("data/temp.txt", "data/table_brick.txt");
 }
 
-void Game::Brick::loadTable() {
+void G2048::Brick::loadTable() {
 	fstream f;
 	f.open("data/table_brick.txt");
 	if (!f.is_open()) return;

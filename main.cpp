@@ -1,3 +1,4 @@
+#include ".\controls\Resourcepack.h"
 #include ".\controls\2048_Brick.h"
 #include ".\controls\2048_Classic.h"
 
@@ -8,21 +9,27 @@ int main() {
 	RenderWindow window(VideoMode(950, 720), "2048", Style::Titlebar | Style::Close);
 	Resourcepack res;
 	Music music;
+	
+	G2048::Skin skin;
+	G2048::Classic classic;
+	G2048::Brick brick;
+
 	Picture background;
 	Button classicButton, brickButton, resouButton;
-	Game::Classic classic;
-	Game::Brick brick;
 	bool isMainmenu = 0;
 
 	// Game::initialization
-	res.setResourcepack("classical");
-	music.openFromFile(res.getNextSound("music"));
-	background.setTexture(res.getTexture("mainmenu"));
-	res.setButton(classicButton, "classicbutton");
-	res.setButton(brickButton, "brickbutton");
-	res.setButton(resouButton, "resoubutton");
+	skin.init(&window, &res, &music);
 	classic.init(&window, &res, &music);
 	brick.init(&window, &res, &music);
+
+	// Game::loadResourcepack
+	classic.loadResourcepack();
+	brick.loadResourcepack();
+	background.setTexture(res.getTexture("mainmenu"));
+	res.setButton(classicButton, "classic");
+	res.setButton(brickButton, "brick");
+	res.setButton(resouButton, "newskin");
 
 	// Game::start 
 	music.play();
@@ -45,21 +52,32 @@ int main() {
 		while (window.pollEvent(e)) {
 			if (e.type == Event::Closed || (e.type == Event::KeyPressed && e.key.code == Keyboard::Escape)) {
 				window.close();
-				music.stop();
 			}
 			else if (e.type == Event::MouseButtonReleased) {
 				if (classicButton.clicked(&window)) {
 					// play 2048::classic
-					classic.loadResourcepack();
 					classic.start();
 				}
 				else if (brickButton.clicked(&window)) {
 					// play 2048::brick
-					brick.loadResourcepack();
 					brick.start();
 				}
 				else if (resouButton.clicked(&window)) {
+					// make window background
+					window.clear();
+					background.draw(&window);
+					classicButton.draw(&window);
+					brickButton.draw(&window);
+					resouButton.draw(&window);
 					// change resourcepack
+					skin.open();
+					// Game::loadResourcepack
+					classic.loadResourcepack();
+					brick.loadResourcepack();
+					background.setTexture(res.getTexture("mainmenu"));
+					res.setButton(classicButton, "classic");
+					res.setButton(brickButton, "brick");
+					res.setButton(resouButton, "newskin");
 				}
 				else continue;
 
@@ -67,5 +85,6 @@ int main() {
 			}
 		}
 	}
+	music.stop();
 	return 0;
 }

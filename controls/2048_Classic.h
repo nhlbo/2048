@@ -1,8 +1,5 @@
 #ifndef _2048_CLASSIC_H
 #define _2048_CLASSIC_H
-#include <SFML/Audio.hpp>
-#include <SFML/Graphics.hpp>
-#include <fstream>
 #include "Animation.h"
 #include "Resourcepack.h"
 #include "Button.h"
@@ -12,9 +9,9 @@
 using namespace sf;
 using namespace std;
 
-namespace Game { class Classic; }
+namespace G2048 { class Classic; }
 
-class Game::Classic {
+class G2048::Classic {
 public:
 	void init(RenderWindow* __window, Resourcepack* __res, Music* __music);
 	bool loadResourcepack();
