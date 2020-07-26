@@ -15,13 +15,13 @@ End Project Date:
 
 - **`19127564` Nguyễn Hữu Thông**
   - **Facebook:** [Thông Nguyễn](https://www.facebook.com/t.ahhahaha)
-  - **Email:** <e-mail>
+  - **Email:** 19127564@student.hcmus.edu.vn
   
 - **`19127507` Nguyễn Quang Phú**
   - **Facebook:** [Nguyễn Quang Phú](https://www.facebook.com/nqp2805)
-  - **Email:** <e-mail>
+  - **Email:** 19127507@student.hcmus.edu.vn
 ## Project Planner
-- [x] **Setup and using SFML lybrary**
+- [x] **Setup and using SFML library**
 - [x] **More option**
 - [x] **Animation**
 - [x] **Resourcepacks**
@@ -40,4 +40,18 @@ End Project Date:
 ## How to play ?
 Use your arrow keys to move the tiles. When two tiles with the same number touch, they merge into one!
 
-![til](./data/how-to-play.gif)
+There are 2 modes: classical mode and brick mode.
+
+There also are 2 skins for you to choose: classical skin and minecraft skin.
+
+**Classical Mode**
+
+![til](./data/classic-classic.gif)
+
+**Brick Mode**
+
+![til](./data/brick-classic.gif)
+
+**Minecraft Skin**
+
+![til](./data/minecraft.gif)
